@@ -11,4 +11,10 @@ export default {
   EDIT_TEST_CHILD_ID: "/testChild/edit/:id",
   RESTORE_TEST_CHILD_ID: "/testChild/restore/:id",
   FORCE_DELETE_TEST_CHILD_ID: "/testChild/forceDelete/:id",
+  USERS: "/users",
+  DELETED_USERS: "/users/deleted",
+  USER_ID: "/user/:id",
+  EDIT_USER_ID: "/user/edit/:id",
+  RESTORE_USER_ID: "/user/restore/:id",
+  FORCE_DELETE_USER_ID: "/user/forceDelete/:id",
 };

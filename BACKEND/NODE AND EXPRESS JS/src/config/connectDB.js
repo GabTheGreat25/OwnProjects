@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
-import { STATUSCODE } from "../constants/index.js";
+import { RESOURCE, STATUSCODE } from "../constants/index.js";
 import ENV from "./environment.js";
 
 const connectDB = async () => {
   try {
-    mongoose.set("strictQuery", false);
+    mongoose.set(RESOURCE.STRICT_QUERY, false);
     return (
       mongoose.connect(ENV.DATABASE_URI),
       {

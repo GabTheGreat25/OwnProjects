@@ -12,10 +12,6 @@ const app = express();
 const run = () => {
   const hostServer = createServer(app);
 
-  app.use((req, res, next) => {
-    next();
-  });
-
   addMiddlewares(app);
   addRoutes(app);
   addErrorHandler(app);
