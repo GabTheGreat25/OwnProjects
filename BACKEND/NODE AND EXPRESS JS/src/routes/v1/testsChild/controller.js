@@ -5,37 +5,43 @@ import { upload } from "../../../utils/cloudinary.js";
 import multipleImages from "../../../utils/multipleImages.js";
 import responseHandler from "../../../utils/responseHandler.js";
 
-const getAllTests = asyncHandler(async (req, res) => {
+const getAllTestsChild = asyncHandler(async (req, res) => {
   const data = await service.getAll();
 
   responseHandler(
     res,
-    data?.length === STATUSCODE.ZERO ? "No test found" : "Get all test success",
+    data?.length === STATUSCODE.ZERO
+      ? "No test child found"
+      : "Get all test child success",
     data
   );
 });
 
-const getAllTestsDeleted = asyncHandler(async (req, res) => {
+const getAllTestsChildDeleted = asyncHandler(async (req, res) => {
   const data = await service.getAllDeleted();
 
   responseHandler(
     res,
     data?.length === STATUSCODE.ZERO
-      ? "No deleted test found"
-      : "Get all deleted test success",
+      ? "No deleted test child found"
+      : "Get all deleted test child success",
     data
   );
 });
 
-const getSingleTest = asyncHandler(async (req, res) => {
+const getSingleTestChild = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const data = await service.getById(id);
 
-  responseHandler(res, !data ? "No test found" : "Get test success", data);
+  responseHandler(
+    res,
+    !data ? "No test child found" : "Get test child success",
+    data
+  );
 });
 
-const createNewTest = [
+const createNewTestChild = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
     const images = await multipleImages(req.files, []);
@@ -45,11 +51,11 @@ const createNewTest = [
       image: images,
     });
 
-    responseHandler(res, "Create test success", [data]);
+    responseHandler(res, "Create test child success", [data]);
   }),
 ];
 
-const updateTest = [
+const updateTestChild = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -60,33 +66,41 @@ const updateTest = [
 
     const data = await service.update(id, { ...req.body, image: images });
 
-    responseHandler(res, "Update test success", [data]);
+    responseHandler(res, "Update test child success", [data]);
   }),
 ];
 
-const deleteTest = asyncHandler(async (req, res) => {
+const deleteTestChild = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const data = await service.deleteById(id);
 
   responseHandler(
     res,
-    data.deleted ? "This test is already deleted" : "Delete test success",
+    data.deleted
+      ? "This test child is already deleted"
+      : "Delete test child success",
     data.deleted ? [] : [data]
   );
 });
 
-const restoreTest = asyncHandler(async (req, res) => {
+const restoreTestChild = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const data = await service.restoreById(id);
 
-  responseHandler(res, !data ? "No test found" : "Restore test success", data);
+  responseHandler(
+    res,
+    !data ? "No test child found" : "Restore test child success",
+    data
+  );
 });
 
-const forceDeleteTest = asyncHandler(async (req, res) => {
+const forceDeleteTestChild = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const data = await service.forceDelete(id);
 
-  const message = !data ? "No test found" : "Force delete test success";
+  const message = !data
+    ? "No test child found"
+    : "Force delete test child success";
 
   await multipleImages(
     [],
@@ -97,12 +111,12 @@ const forceDeleteTest = asyncHandler(async (req, res) => {
 });
 
 export {
-  getAllTests,
-  getAllTestsDeleted,
-  getSingleTest,
-  createNewTest,
-  updateTest,
-  deleteTest,
-  restoreTest,
-  forceDeleteTest,
+  getAllTestsChild,
+  getAllTestsChildDeleted,
+  getSingleTestChild,
+  createNewTestChild,
+  updateTestChild,
+  deleteTestChild,
+  restoreTestChild,
+  forceDeleteTestChild,
 };

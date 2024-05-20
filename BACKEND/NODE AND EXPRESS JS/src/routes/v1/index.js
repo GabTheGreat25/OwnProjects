@@ -1,8 +1,12 @@
 import testsRoute from "./tests/route.js";
+import testChildRoute from "./testsChild/route.js";
 
 const routes = [
   {
     route: testsRoute,
+  },
+  {
+    route: testChildRoute,
   },
 ];
 

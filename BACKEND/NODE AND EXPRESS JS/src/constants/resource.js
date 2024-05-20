@@ -4,5 +4,8 @@ export default {
   PRODUCTION: "production",
   VALIDATION_ERROR: "ValidationError",
   IMAGES: "projectImages",
+  ID: "_id",
+  TESTS: "tests",
   TEST: "test",
+  TEST_CHILD: "testChild",
 };
