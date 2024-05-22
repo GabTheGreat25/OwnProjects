@@ -2,10 +2,15 @@ import service from "./service.js";
 import asyncHandler from "express-async-handler";
 import { STATUSCODE } from "../../../constants/index.js";
 import { upload } from "../../../utils/cloudinary.js";
-import multipleImages from "../../../utils/multipleImages.js";
-import responseHandler from "../../../utils/responseHandler.js";
 import bcrypt from "bcrypt";
 import ENV from "../../../config/environment.js";
+import {
+  generateAccess,
+  responseHandler,
+  multipleImages,
+} from "../../../utils/index.js";
+
+const blacklistedTokens = [];
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const data = await service.getAll();
@@ -36,6 +41,29 @@ const getSingleUser = asyncHandler(async (req, res) => {
 
   responseHandler(res, !data ? "No user found" : "Get user success", data);
 });
+
+const authenticateUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const data = await service.getAll({ filter: { email } });
+
+  const user = data[STATUSCODE.ZERO];
+
+  if (!(await bcrypt.compare(password, user.password))) {
+    responseHandler(res, "Password do not match", []);
+    return;
+  }
+
+  const message = !user ? "No user found" : "Login success";
+
+  responseHandler(res, message, user, generateAccess({}));
+});
+
+const logoutUser = (req, res) => {
+  const meta = generateAccess({});
+  blacklistedTokens[STATUSCODE.ZERO] = meta?.access;
+
+  responseHandler(res, "Logout Success", []);
+};
 
 const createNewUser = [
   upload.array("image"),
@@ -94,7 +122,7 @@ const forceDeleteUser = asyncHandler(async (req, res) => {
 
   await multipleImages(
     [],
-    data && data.image ? data.image.map((image) => image.public_id) : []
+    data?.image ? data.image.map((image) => image.public_id) : []
   );
 
   responseHandler(res, message, data);
@@ -109,4 +137,6 @@ export {
   deleteUser,
   restoreUser,
   forceDeleteUser,
+  authenticateUser,
+  logoutUser,
 };

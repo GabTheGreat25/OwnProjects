@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { RESOURCE, STATUSCODE } from "../constants/index.js";
 import ENV from "./environment.js";
 
-const connectDB = async () => {
+async function connectDB() {
   try {
     mongoose.set(RESOURCE.STRICT_QUERY, false);
     return (
@@ -16,6 +16,6 @@ const connectDB = async () => {
     const mongoExit = STATUSCODE.ONE;
     process.exit(mongoExit);
   }
-};
+}
 
 export default connectDB;

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 import { RESOURCE } from "../../../constants/index.js";
 import badWords from "bad-words";
 import customBadWords from "../../../utils/customBadWords.js";
@@ -10,7 +10,7 @@ const schemaOptions = {
   timestamps: true,
 };
 
-const schema = new mongoose.Schema(
+const schema = new Schema(
   {
     message: {
       type: String,
@@ -37,4 +37,4 @@ const schema = new mongoose.Schema(
   schemaOptions
 );
 
-export default mongoose.model(RESOURCE.TEST, schema);
+export default model(RESOURCE.TEST, schema);

@@ -14,12 +14,9 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: (req, file) => {
-    const fileName = file.originalname.replace(/\.[^/.]+$/, "");
-    const uniqueFilename = uuidv4();
-
     return {
       folder: RESOURCE.IMAGES,
-      public_id: `${fileName}-${uniqueFilename}`,
+      public_id: `${file.originalname.replace(/\.[^/.]+$/, "")}-${uuidv4()}`,
     };
   },
 });

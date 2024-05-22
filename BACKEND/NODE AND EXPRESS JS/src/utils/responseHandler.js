@@ -1,7 +1,10 @@
-const responseHandler = (res, message, data) => {
-  if (!data) {
-    res.send({ status: false, message: message, data: [] });
-  } else res.send({ status: true, message: message, data });
-};
+function responseHandler(res, message, data, meta = {}) {
+  res.send({
+    status: !!data,
+    message: message,
+    data: data || [],
+    meta: meta,
+  });
+}
 
 export default responseHandler;

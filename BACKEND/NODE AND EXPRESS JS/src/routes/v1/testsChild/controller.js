@@ -2,8 +2,7 @@ import service from "./service.js";
 import asyncHandler from "express-async-handler";
 import { STATUSCODE } from "../../../constants/index.js";
 import { upload } from "../../../utils/cloudinary.js";
-import multipleImages from "../../../utils/multipleImages.js";
-import responseHandler from "../../../utils/responseHandler.js";
+import { responseHandler, multipleImages } from "../../../utils/index.js";
 
 const getAllTestsChild = asyncHandler(async (req, res) => {
   const data = await service.getAll();
@@ -104,7 +103,7 @@ const forceDeleteTestChild = asyncHandler(async (req, res) => {
 
   await multipleImages(
     [],
-    data && data.image ? data.image.map((image) => image.public_id) : []
+    data?.image ? data.image.map((image) => image.public_id) : []
   );
 
   responseHandler(res, message, data);

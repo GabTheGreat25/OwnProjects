@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 import { RESOURCE } from "../../../constants/index.js";
 
 const schemaOptions = {
@@ -6,7 +6,7 @@ const schemaOptions = {
   timestamps: true,
 };
 
-const schema = new mongoose.Schema(
+const schema = new Schema(
   {
     name: {
       type: String,
@@ -14,6 +14,7 @@ const schema = new mongoose.Schema(
     },
     email: {
       type: String,
+      unique: true,
       required: true,
     },
     password: {
@@ -36,4 +37,4 @@ const schema = new mongoose.Schema(
   schemaOptions
 );
 
-export default mongoose.model(RESOURCE.USERS, schema);
+export default model(RESOURCE.USERS, schema);

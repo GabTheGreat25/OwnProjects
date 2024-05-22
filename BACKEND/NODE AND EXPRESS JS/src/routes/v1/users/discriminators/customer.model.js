@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { Schema } from "mongoose";
 import { RESOURCE, ROLE } from "../../../../constants/index.js";
 import users from "../model.js";
 import badWords from "bad-words";
@@ -11,7 +11,7 @@ const schema = {
   discriminatorKey: RESOURCE.ROLES,
 };
 
-const customerSchema = new mongoose.Schema(
+const customerSchema = new Schema(
   {
     details: {
       type: String,

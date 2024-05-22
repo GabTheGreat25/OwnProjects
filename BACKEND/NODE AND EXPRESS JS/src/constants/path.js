@@ -1,4 +1,6 @@
 export default {
+  LOGIN: "/login",
+  LOGOUT: "/logout",
   TESTS: "/tests",
   DELETED_TESTS: "/tests/deleted",
   TEST_ID: "/test/:id",

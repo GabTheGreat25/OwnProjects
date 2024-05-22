@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 import { RESOURCE } from "../../../constants/index.js";
 import badWords from "bad-words";
 import customBadWords from "../../../utils/customBadWords.js";
@@ -10,10 +10,10 @@ const schemaOptions = {
   timestamps: true,
 };
 
-const schema = new mongoose.Schema(
+const schema = new Schema(
   {
     test: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: RESOURCE.TEST,
     },
@@ -42,4 +42,4 @@ const schema = new mongoose.Schema(
   schemaOptions
 );
 
-export default mongoose.model(RESOURCE.TEST_CHILD, schema);
+export default model(RESOURCE.TEST_CHILD, schema);

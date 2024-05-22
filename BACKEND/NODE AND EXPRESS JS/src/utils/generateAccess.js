@@ -1,5 +1,10 @@
 import generateToken from "./generateToken.js";
 
-export default (payload = {}) => {
-  return generateToken(payload, "30s");
-};
+function generateAccess(payload = {}) {
+  const accessToken = generateToken(payload, "30s");
+  return {
+    access: accessToken,
+  };
+}
+
+export default generateAccess;

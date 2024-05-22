@@ -2,21 +2,21 @@ import model from "./model.js";
 import lookup from "../../../utils/aggregate.js";
 import { RESOURCE } from "../../../constants/index.js";
 
-const getAll = async () => {
+async function getAll() {
   return await model
     .aggregate()
     .match({ deleted: false })
     .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));
-};
+}
 
-const getAllDeleted = async () => {
+async function getAllDeleted() {
   return await model
     .aggregate()
     .match({ deleted: true })
     .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));
-};
+}
 
-const getById = async (_id) => {
+async function getById(_id) {
   const result = await model.findOne({ _id, deleted: false });
   return result
     ? await model
@@ -24,31 +24,31 @@ const getById = async (_id) => {
         .match({ _id: result._id })
         .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []))
     : null;
-};
+}
 
-const add = async (body) => {
+async function add(body) {
   return await model.create(body);
-};
+}
 
-const update = async (_id, body) => {
+async function update(_id, body) {
   return await model.findOneAndUpdate({ _id }, body);
-};
+}
 
-const deleteById = async (_id) => {
+async function deleteById(_id) {
   return await model.findOneAndUpdate({ _id }, { deleted: true });
-};
+}
 
-const restoreById = async (_id) => {
+async function restoreById(_id) {
   return await model.findOneAndUpdate(
     { _id },
     { deleted: false },
     { new: true }
   );
-};
+}
 
-const forceDelete = async (_id) => {
+async function forceDelete(_id) {
   return await model.findOneAndDelete({ _id });
-};
+}
 
 export default {
   getAll,

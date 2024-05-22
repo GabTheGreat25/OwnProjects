@@ -4,17 +4,17 @@ import employeeModel from "./discriminators/employee.model.js";
 import customerModel from "./discriminators/customer.model.js";
 import { ROLE } from "../../../constants/index.js";
 
-const getAll = async () => {
-  return await model.find({ deleted: false });
-};
+async function getAll() {
+  return await model.find({ deleted: false }).select("+password");
+}
 
-const getAllDeleted = async () => {
+async function getAllDeleted() {
   return await model.find({ deleted: true });
-};
+}
 
-const getById = async (_id) => {
+async function getById(_id) {
   return await model.findOne({ _id, deleted: false });
-};
+}
 
 async function add(body) {
   return await (body.roles === ROLE.ADMIN
@@ -27,25 +27,25 @@ async function add(body) {
   ).create([body]);
 }
 
-const update = async (_id, body) => {
+async function update(_id, body) {
   return await model.findOneAndUpdate({ _id }, body);
-};
+}
 
-const deleteById = async (_id) => {
+async function deleteById(_id) {
   return await model.findOneAndUpdate({ _id }, { deleted: true });
-};
+}
 
-const restoreById = async (_id) => {
+async function restoreById(_id) {
   return await model.findOneAndUpdate(
     { _id },
     { deleted: false },
     { new: true }
   );
-};
+}
 
-const forceDelete = async (_id) => {
+async function forceDelete(_id) {
   return await model.findOneAndDelete({ _id });
-};
+}
 
 export default {
   getAll,
