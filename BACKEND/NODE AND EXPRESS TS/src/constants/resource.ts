@@ -1,0 +1,15 @@
+export default {
+  AUTH: "Auth",
+  DEV: "dev",
+  PRODUCTION: "production",
+  API: "/api/",
+  V1: "v1/",
+  VALIDATION_ERROR: "ValidationError",
+  IMAGES: "projectImages",
+  ID: "_id",
+  ROLES: "roles",
+  TESTS: "tests",
+  TEST: "test",
+  TEST_CHILD: "testChild",
+  USERS: "users",
+};

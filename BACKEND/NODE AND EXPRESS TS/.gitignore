@@ -2,9 +2,10 @@
 node_modules/
 
 # Environment variables file
-dist
 .env
-
 
 # Package lock file
 package-lock.json
+
+# Compiled files
+dist/
