@@ -22,7 +22,7 @@ const userRoutes = [
     method: METHOD.POST,
     path: PATH.LOGIN,
     middleware: [],
-    handler: userController.authenticateUser,
+    handler: userController.loginUser,
   },
   {
     method: METHOD.POST,
@@ -32,7 +32,7 @@ const userRoutes = [
   },
   {
     method: METHOD.GET,
-    path: PATH.EDIT_USER_ID,
+    path: PATH.USER_ID,
     middleware: [verifyToken],
     handler: userController.getSingleUser,
   },
@@ -50,7 +50,7 @@ const userRoutes = [
   },
   {
     method: METHOD.DELETE,
-    path: PATH.EDIT_USER_ID,
+    path: PATH.USER_ID,
     middleware: [verifyToken],
     handler: userController.deleteUser,
   },

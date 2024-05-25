@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { RESOURCE, STATUSCODE } from "../constants/index.js";
 import ENV from "./environment.js";
 
-async function connectDB() {
+export default async function connectDB() {
   try {
     mongoose.set(RESOURCE.STRICT_QUERY, false);
     return (
@@ -17,5 +17,3 @@ async function connectDB() {
     process.exit(mongoExit);
   }
 }
-
-export default connectDB;

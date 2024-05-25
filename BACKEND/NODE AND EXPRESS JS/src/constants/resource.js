@@ -2,6 +2,7 @@ export default {
   AUTH: "Auth",
   DEV: "dev",
   PRODUCTION: "production",
+  DEVELOPMENT: "development",
   API: "/api/",
   V1: "v1/",
   VALIDATION_ERROR: "ValidationError",

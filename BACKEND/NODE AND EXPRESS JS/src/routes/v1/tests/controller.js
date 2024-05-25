@@ -1,7 +1,7 @@
 import service from "./service.js";
 import asyncHandler from "express-async-handler";
 import { STATUSCODE } from "../../../constants/index.js";
-import { upload } from "../../../utils/cloudinary.js";
+import { upload } from "../../../helpers/cloudinary.js";
 import { responseHandler, multipleImages } from "../../../utils/index.js";
 
 const getAllTests = asyncHandler(async (req, res) => {
@@ -52,10 +52,12 @@ const updateTest = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const oldData = await service.getById(id);
+    const oldData = await service.getImageById(id);
 
-    const oldImagePublicIds = oldData.image.map((image) => image.public_id);
-    const images = await multipleImages(req.files, oldImagePublicIds);
+    const images = await multipleImages(
+      req.files,
+      oldData?.image.map((image) => image.public_id) || []
+    );
 
     const data = await service.update(id, { ...req.body, image: images });
 
@@ -69,8 +71,8 @@ const deleteTest = asyncHandler(async (req, res) => {
 
   responseHandler(
     res,
-    data.deleted ? "This test is already deleted" : "Delete test success",
-    data.deleted ? [] : [data]
+    data?.deleted ? "This test is already deleted" : "Delete test success",
+    data?.deleted ? [] : [data]
   );
 });
 
@@ -78,7 +80,11 @@ const restoreTest = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const data = await service.restoreById(id);
 
-  responseHandler(res, !data ? "No test found" : "Restore test success", data);
+  responseHandler(
+    res,
+    !data?.deleted ? "Test is not deleted" : "Restore test success",
+    !data?.deleted ? [] : data
+  );
 });
 
 const forceDeleteTest = asyncHandler(async (req, res) => {

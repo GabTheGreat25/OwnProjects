@@ -1,4 +1,4 @@
-function responseHandler(res, message, data, meta = {}) {
+export default function responseHandler(res, message, data, meta = {}) {
   res.send({
     status: !!data,
     message: message,
@@ -6,5 +6,3 @@ function responseHandler(res, message, data, meta = {}) {
     meta: meta,
   });
 }
-
-export default responseHandler;

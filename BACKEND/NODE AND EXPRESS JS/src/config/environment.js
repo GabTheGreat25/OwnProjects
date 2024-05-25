@@ -6,7 +6,7 @@ dotenv.config({
 });
 
 const ENV = {
-  NODE_ENV: process.env.NODE_ENV || RESOURCE.PRODUCTION,
+  NODE_ENV: process.env.NODE_ENV || RESOURCE.DEVELOPMENT,
   PORT: process.env.PORT,
   DATABASE_URI: process.env.DATABASE_URI,
   SALT_NUMBER: Number(process.env.SALT_NUMBER),

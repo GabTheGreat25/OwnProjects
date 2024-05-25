@@ -26,12 +26,16 @@ async function getById(_id) {
     : null;
 }
 
+async function getImageById(_id) {
+  return await model.findOne({ _id, deleted: false }).select("image");
+}
+
 async function add(body) {
   return await model.create(body);
 }
 
 async function update(_id, body) {
-  return await model.findOneAndUpdate({ _id }, body);
+  return await model.findOneAndUpdate({ _id }, body, { new: true });
 }
 
 async function deleteById(_id) {
@@ -39,11 +43,7 @@ async function deleteById(_id) {
 }
 
 async function restoreById(_id) {
-  return await model.findOneAndUpdate(
-    { _id },
-    { deleted: false },
-    { new: true }
-  );
+  return await model.findOneAndUpdate({ _id }, { deleted: false });
 }
 
 async function forceDelete(_id) {
@@ -54,6 +54,7 @@ export default {
   getAll,
   getAllDeleted,
   getById,
+  getImageById,
   add,
   update,
   deleteById,
