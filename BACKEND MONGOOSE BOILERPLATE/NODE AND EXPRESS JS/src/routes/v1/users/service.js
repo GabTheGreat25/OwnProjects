@@ -21,13 +21,14 @@ async function getImageById(_id) {
 }
 
 async function add(body) {
-  return await (body.roles === ROLE.ADMIN
-    ? adminModel
-    : body.roles === ROLE.EMPLOYEE
-    ? employeeModel
-    : body.roles === ROLE.CUSTOMER
-    ? customerModel
-    : model
+  return await (
+    body.roles === ROLE.ADMIN
+      ? adminModel
+      : body.roles === ROLE.EMPLOYEE
+        ? employeeModel
+        : body.roles === ROLE.CUSTOMER
+          ? customerModel
+          : model
   ).create([body]);
 }
 

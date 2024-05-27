@@ -37,7 +37,7 @@ async function forceDelete(_id) {
   const deletedDocument = await model.findOneAndDelete({ _id });
 
   return Promise.all([testChildModel.deleteMany({ test: _id })]).then(
-    () => deletedDocument
+    () => deletedDocument,
   );
 }
 

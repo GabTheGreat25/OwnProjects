@@ -31,10 +31,10 @@ async function add(body: UserModel) {
     (body as AdminModel).roles === ROLE.ADMIN
       ? adminDiscriminator
       : (body as EmployeeModel).roles === ROLE.EMPLOYEE
-      ? employeeDiscrimantor
-      : (body as CustomerModel).roles === ROLE.CUSTOMER
-      ? customerDiscrimantor
-      : model;
+        ? employeeDiscrimantor
+        : (body as CustomerModel).roles === ROLE.CUSTOMER
+          ? customerDiscrimantor
+          : model;
 
   return await (modelToUse as typeof model).create(body);
 }

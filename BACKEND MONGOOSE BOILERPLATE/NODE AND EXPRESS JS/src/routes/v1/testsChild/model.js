@@ -39,7 +39,7 @@ const schema = new Schema(
       default: false,
     },
   },
-  schemaOptions
+  schemaOptions,
 );
 
 export default model(RESOURCE.TEST_CHILD, schema);

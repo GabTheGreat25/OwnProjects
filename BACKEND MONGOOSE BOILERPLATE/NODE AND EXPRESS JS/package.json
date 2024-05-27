@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
+    "format": "prettier --write \"src/**/*.js\"",
     "dev": "nodemon server"
   },
   "author": "GabTheGreat25",
@@ -29,7 +30,8 @@
     "validator": "^13.12.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5"
   },
   "type": "module"
 }

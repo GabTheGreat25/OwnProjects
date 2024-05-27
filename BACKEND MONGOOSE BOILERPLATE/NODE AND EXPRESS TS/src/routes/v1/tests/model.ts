@@ -35,7 +35,7 @@ const schema = new Schema<TestModel>(
       default: false,
     },
   },
-  schemaOptions
+  schemaOptions,
 );
 
 export default model(RESOURCE.TEST, schema);

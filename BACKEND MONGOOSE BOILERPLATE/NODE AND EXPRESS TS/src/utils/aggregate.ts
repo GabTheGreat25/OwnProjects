@@ -5,7 +5,7 @@ const lookup = (
   from: string,
   localField: string,
   as: string,
-  pipeline: PipelineStage[]
+  pipeline: PipelineStage[],
 ): PipelineStage => ({
   $lookup: {
     from,

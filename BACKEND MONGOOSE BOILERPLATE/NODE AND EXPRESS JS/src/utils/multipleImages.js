@@ -14,7 +14,7 @@ export default async function multipleImages(files, oldImagePublicIds) {
         public_id: result.public_id,
         url: result.secure_url,
         originalname: file.originalname,
-      }))
+      })),
   );
 
   return Promise.all(uploadPromises);

@@ -20,7 +20,7 @@ const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
     data,
     data?.length === STATUSCODE.ZERO
       ? "No Users found"
-      : "All Users retrieved successfully"
+      : "All Users retrieved successfully",
   );
 });
 
@@ -32,7 +32,7 @@ const getAllUsersDeleted = asyncHandler(async (req: Request, res: Response) => {
     data,
     data?.length === STATUSCODE.ZERO
       ? "No Deleted Users found"
-      : "All Deleted Users retrieved successfully"
+      : "All Deleted Users retrieved successfully",
   );
 });
 
@@ -44,7 +44,7 @@ const getSingleUser = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(
     res,
     data,
-    !data ? "No User found" : "User retrieved successfully"
+    !data ? "No User found" : "User retrieved successfully",
   );
 });
 
@@ -77,7 +77,7 @@ const logoutUser = (req: Request, res: Response) => {
       responseHandler(
         res,
         [],
-        message ? "Error logging out" : "Logout Success"
+        message ? "Error logging out" : "Logout Success",
       );
     });
   }
@@ -107,7 +107,7 @@ const updateUser = [
 
     const images = await multipleImages(
       req.files as Express.Multer.File[],
-      oldData?.image.map((image) => image.public_id) || []
+      oldData?.image.map((image) => image.public_id) || [],
     );
 
     const data = await service.update(id, { ...req.body, image: images });
@@ -123,7 +123,7 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(
     res,
     data?.deleted ? [] : [data],
-    data?.deleted ? "User is already deleted" : "User deleted successfully"
+    data?.deleted ? "User is already deleted" : "User deleted successfully",
   );
 });
 
@@ -135,7 +135,7 @@ const restoreUser = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(
     res,
     !data?.deleted ? [] : data,
-    !data?.deleted ? "User is not deleted" : "User restored successfully"
+    !data?.deleted ? "User is not deleted" : "User restored successfully",
   );
 });
 
@@ -147,7 +147,7 @@ const forceDeleteUser = asyncHandler(async (req: Request, res: Response) => {
 
   await multipleImages(
     [],
-    data?.image ? data.image.map((image) => image.public_id) : []
+    data?.image ? data.image.map((image) => image.public_id) : [],
   );
 
   responseHandler(res, data, message);

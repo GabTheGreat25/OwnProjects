@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "build": "npx tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node server.ts",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\""
   },
@@ -44,6 +45,7 @@
     "@types/uuid": "^9.0.8",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.0",
+    "prettier": "^3.2.5",
     "ts-node": "^10.9.2"
   }
 }

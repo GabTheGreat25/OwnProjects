@@ -24,7 +24,7 @@ const customerSchema = new Schema(
       },
     },
   },
-  schema
+  schema,
 );
 
 export default users.discriminator(ROLE.CUSTOMER, customerSchema);

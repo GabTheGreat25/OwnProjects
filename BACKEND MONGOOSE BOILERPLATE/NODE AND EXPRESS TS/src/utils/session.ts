@@ -10,6 +10,6 @@ export default function addSession(app: Express) {
       resave: false,
       saveUninitialized: true,
       cookie: { secure: ENV.NODE_ENV === RESOURCE.PRODUCTION ? true : false },
-    })
+    }),
   );
 }

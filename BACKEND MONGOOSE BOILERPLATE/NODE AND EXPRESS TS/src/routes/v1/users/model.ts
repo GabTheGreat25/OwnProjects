@@ -35,7 +35,7 @@ const schema = new Schema<UserModel>(
       default: false,
     },
   },
-  schemaOptions
+  schemaOptions,
 );
 
 export default model(RESOURCE.USERS, schema);

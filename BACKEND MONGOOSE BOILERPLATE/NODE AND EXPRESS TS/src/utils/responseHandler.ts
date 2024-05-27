@@ -5,7 +5,7 @@ export default function responseHandler(
   res: Response,
   data: any,
   message: string,
-  meta: MetaData = {}
+  meta: MetaData = {},
 ): void {
   res.send({
     status: !!data,

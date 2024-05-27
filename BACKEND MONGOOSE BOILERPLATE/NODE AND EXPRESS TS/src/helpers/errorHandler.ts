@@ -12,7 +12,7 @@ const errorHandler = (
   error: any,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   let statusCode = error.status || STATUSCODE.INTERNAL_SERVER_ERROR;
   let errorMessage = error.message;

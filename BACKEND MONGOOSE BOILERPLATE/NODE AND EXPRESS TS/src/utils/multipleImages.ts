@@ -3,7 +3,7 @@ import { UploadImages } from "../types";
 
 export default async function multipleImages(
   files: Express.Multer.File[] | undefined,
-  oldImagePublicIds: (string | undefined)[]
+  oldImagePublicIds: (string | undefined)[],
 ): Promise<UploadImages[]> {
   if (!files || !Array.isArray(files)) return [];
 
@@ -20,7 +20,7 @@ export default async function multipleImages(
         public_id: result.public_id,
         url: result.secure_url,
         originalname: file.originalname,
-      }))
+      })),
   );
 
   return Promise.all(uploadPromises);

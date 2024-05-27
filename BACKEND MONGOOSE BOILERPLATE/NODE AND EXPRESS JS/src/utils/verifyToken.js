@@ -9,13 +9,13 @@ export default function verifyJWT(req, res, next) {
   !token
     ? responseHandler(res, "Please Log in First", [])
     : isTokenBlacklisted(token)
-    ? responseHandler(res, "Token Expired", [])
-    : (() => {
-        try {
-          req.user = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
-          next();
-        } catch (error) {
-          responseHandler(res, "Invalid Token", []);
-        }
-      })();
+      ? responseHandler(res, "Token Expired", [])
+      : (() => {
+          try {
+            req.user = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
+            next();
+          } catch (error) {
+            responseHandler(res, "Invalid Token", []);
+          }
+        })();
 }

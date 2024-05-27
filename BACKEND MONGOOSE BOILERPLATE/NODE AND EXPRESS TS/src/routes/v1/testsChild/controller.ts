@@ -13,7 +13,7 @@ const getAllTestsChild = asyncHandler(async (req: Request, res: Response) => {
     data,
     data?.length === STATUSCODE.ZERO
       ? "No Test Childs found"
-      : "All Test Childs retrieved successfully"
+      : "All Test Childs retrieved successfully",
   );
 });
 
@@ -26,9 +26,9 @@ const getAllTestsChildDeleted = asyncHandler(
       data,
       data?.length === STATUSCODE.ZERO
         ? "No Deleted Test Childs found"
-        : "All Deleted Test Childs retrieved successfully"
+        : "All Deleted Test Childs retrieved successfully",
     );
-  }
+  },
 );
 
 const getSingleTestChild = asyncHandler(async (req: Request, res: Response) => {
@@ -39,7 +39,7 @@ const getSingleTestChild = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(
     res,
     data,
-    !data ? "No Test Child found" : "Test Child retrieved successfully"
+    !data ? "No Test Child found" : "Test Child retrieved successfully",
   );
 });
 
@@ -65,7 +65,7 @@ const updateTestChild = [
 
     const images = await multipleImages(
       req.files as Express.Multer.File[],
-      oldData?.image.map((image) => image.public_id) || []
+      oldData?.image.map((image) => image.public_id) || [],
     );
 
     const data = await service.update(id, { ...req.body, image: images });
@@ -83,7 +83,7 @@ const deleteTestChild = asyncHandler(async (req: Request, res: Response) => {
     data?.deleted ? [] : [data],
     data?.deleted
       ? "Test Child is already deleted"
-      : "Test Child deleted successfully"
+      : "Test Child deleted successfully",
   );
 });
 
@@ -96,7 +96,7 @@ const restoreTestChild = asyncHandler(async (req: Request, res: Response) => {
     !data?.deleted ? [] : data,
     !data?.deleted
       ? "Test child is not deleted"
-      : "Test child restored successfully"
+      : "Test child restored successfully",
   );
 });
 
@@ -111,11 +111,11 @@ const forceDeleteTestChild = asyncHandler(
 
     await multipleImages(
       [],
-      data?.image ? data.image.map((image) => image.public_id) : []
+      data?.image ? data.image.map((image) => image.public_id) : [],
     );
 
     responseHandler(res, data, message);
-  }
+  },
 );
 
 export {
