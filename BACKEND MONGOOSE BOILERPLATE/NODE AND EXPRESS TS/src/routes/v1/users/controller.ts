@@ -17,8 +17,10 @@ const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
-    data?.length === STATUSCODE.ZERO ? "No user found" : "Get all user success",
-    data
+    data,
+    data?.length === STATUSCODE.ZERO
+      ? "No Users found"
+      : "All Users retrieved successfully"
   );
 });
 
@@ -27,10 +29,10 @@ const getAllUsersDeleted = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
+    data,
     data?.length === STATUSCODE.ZERO
-      ? "No deleted user found"
-      : "Get all deleted user success",
-    data
+      ? "No Deleted Users found"
+      : "All Deleted Users retrieved successfully"
   );
 });
 
@@ -39,7 +41,11 @@ const getSingleUser = asyncHandler(async (req: Request, res: Response) => {
 
   const data = await service.getById(id);
 
-  responseHandler(res, !data ? "No user found" : "Get user success", data);
+  responseHandler(
+    res,
+    data,
+    !data ? "No User found" : "User retrieved successfully"
+  );
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
@@ -49,17 +55,17 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const user = data[STATUSCODE.ZERO];
 
   if (!(await bcrypt.compare(password, user.password))) {
-    responseHandler(res, "Password do not match", []);
+    responseHandler(res, [], "Password do not match");
     return;
   }
 
-  const message = !user ? "No user found" : "Login success";
+  const message = !user ? "No User found" : "Login success";
 
   const accessToken = generateAccess({});
 
   req.session.accessToken = accessToken.access;
 
-  responseHandler(res, message, user, accessToken);
+  responseHandler(res, user, message, accessToken);
 });
 
 const logoutUser = (req: Request, res: Response) => {
@@ -70,8 +76,8 @@ const logoutUser = (req: Request, res: Response) => {
     req.session.destroy((message) => {
       responseHandler(
         res,
-        message ? "Error logging out" : "Logout Success",
-        []
+        [],
+        message ? "Error logging out" : "Logout Success"
       );
     });
   }
@@ -89,7 +95,7 @@ const createNewUser = [
       image: images,
     });
 
-    responseHandler(res, "Create user success", [data]);
+    responseHandler(res, [data], "User created successfully");
   }),
 ];
 
@@ -106,7 +112,7 @@ const updateUser = [
 
     const data = await service.update(id, { ...req.body, image: images });
 
-    responseHandler(res, "Update user success", [data]);
+    responseHandler(res, [data], "User updated successfully");
   }),
 ];
 
@@ -116,8 +122,8 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
-    data?.deleted ? "This user is already deleted" : "Delete user success",
-    data?.deleted ? [] : [data]
+    data?.deleted ? [] : [data],
+    data?.deleted ? "User is already deleted" : "User deleted successfully"
   );
 });
 
@@ -128,8 +134,8 @@ const restoreUser = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
-    !data?.deleted ? "User is not deleted" : "Restore user success",
-    !data?.deleted ? [] : data
+    !data?.deleted ? [] : data,
+    !data?.deleted ? "User is not deleted" : "User restored successfully"
   );
 });
 
@@ -137,14 +143,14 @@ const forceDeleteUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = await service.forceDelete(id);
 
-  const message = !data ? "No user found" : "Force delete user success";
+  const message = !data ? "No User found" : "User force deleted successfully";
 
   await multipleImages(
     [],
     data?.image ? data.image.map((image) => image.public_id) : []
   );
 
-  responseHandler(res, message, data);
+  responseHandler(res, data, message);
 });
 
 export {

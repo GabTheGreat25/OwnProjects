@@ -10,10 +10,10 @@ const getAllTestsChild = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
+    data,
     data?.length === STATUSCODE.ZERO
-      ? "No test child found"
-      : "Get all test child success",
-    data
+      ? "No Test Childs found"
+      : "All Test Childs retrieved successfully"
   );
 });
 
@@ -23,10 +23,10 @@ const getAllTestsChildDeleted = asyncHandler(
 
     responseHandler(
       res,
+      data,
       data?.length === STATUSCODE.ZERO
-        ? "No deleted test child found"
-        : "Get all deleted test child success",
-      data
+        ? "No Deleted Test Childs found"
+        : "All Deleted Test Childs retrieved successfully"
     );
   }
 );
@@ -38,8 +38,8 @@ const getSingleTestChild = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
-    !data ? "No test child found" : "Get test child success",
-    data
+    data,
+    !data ? "No Test Child found" : "Test Child retrieved successfully"
   );
 });
 
@@ -53,7 +53,7 @@ const createNewTestChild = [
       image: images,
     });
 
-    responseHandler(res, "Create test child success", [data]);
+    responseHandler(res, [data], "Test Child created successfully");
   }),
 ];
 
@@ -70,7 +70,7 @@ const updateTestChild = [
 
     const data = await service.update(id, { ...req.body, image: images });
 
-    responseHandler(res, "Update test child success", [data]);
+    responseHandler(res, [data], "Test Child updated successfully");
   }),
 ];
 
@@ -80,10 +80,10 @@ const deleteTestChild = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
+    data?.deleted ? [] : [data],
     data?.deleted
-      ? "This test child is already deleted"
-      : "Delete test child success",
-    data?.deleted ? [] : [data]
+      ? "Test Child is already deleted"
+      : "Test Child deleted successfully"
   );
 });
 
@@ -93,8 +93,10 @@ const restoreTestChild = asyncHandler(async (req: Request, res: Response) => {
 
   responseHandler(
     res,
-    !data?.deleted ? "Test child is not deleted" : "Restore test success",
-    !data?.deleted ? [] : data
+    !data?.deleted ? [] : data,
+    !data?.deleted
+      ? "Test child is not deleted"
+      : "Test child restored successfully"
   );
 });
 
@@ -104,15 +106,15 @@ const forceDeleteTestChild = asyncHandler(
     const data = await service.forceDelete(id);
 
     const message = !data
-      ? "No test child found"
-      : "Force delete test child success";
+      ? "No Test Child found"
+      : "Test Child force deleted successfully";
 
     await multipleImages(
       [],
       data?.image ? data.image.map((image) => image.public_id) : []
     );
 
-    responseHandler(res, message, data);
+    responseHandler(res, data, message);
   }
 );
 

@@ -6,7 +6,6 @@ export default {
   API: "/api/",
   V1: "v1/",
   VALIDATION_ERROR: "ValidationError",
-  STRICT_QUERY: "strictQuery",
   IMAGES: "projectImages",
   ID: "_id",
   ROLES: "roles",

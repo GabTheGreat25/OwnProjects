@@ -3,14 +3,14 @@ import { MetaData } from "../types";
 
 export default function responseHandler(
   res: Response,
-  message: string,
   data: any,
+  message: string,
   meta: MetaData = {}
 ): void {
   res.send({
     status: !!data,
-    message: message,
     data: data || [],
+    message: message,
     meta: meta,
   });
 }

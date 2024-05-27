@@ -1,8 +1,8 @@
 export default function responseHandler(res, message, data, meta = {}) {
   res.send({
     status: !!data,
-    message: message,
     data: data || [],
+    message: message,
     meta: meta,
   });
 }
