@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 import { UploadImages } from "src/types";
 
 export class CreateTestDto {
@@ -6,7 +6,6 @@ export class CreateTestDto {
   @IsNotEmpty()
   message: string;
 
-  @IsOptional()
   @IsNotEmpty()
   image: UploadImages[];
 }

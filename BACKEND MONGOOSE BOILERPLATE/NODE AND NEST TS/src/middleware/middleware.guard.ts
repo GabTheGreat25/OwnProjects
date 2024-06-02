@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { TokenService } from "./middleware.verifyToken";
@@ -18,21 +23,27 @@ export class JwtAuthGuard implements CanActivate {
     const token = request.headers.authorization?.split(" ")[1];
 
     return token
-      ? this.tokenService.isTokenBlacklisted()
-        ? false
-        : (() => {
+      ? !this.tokenService.isTokenBlacklisted()
+        ? (() => {
             request.user = this.jwtService.verify(token, {
               secret: ENV.ACCESS_TOKEN_SECRET,
             });
-
             const requiredRoles = this.reflector.get<string[]>(
               RESOURCE.ROLES,
               context.getHandler(),
             );
-
-            if (!requiredRoles || requiredRoles.includes(request.user.role))
+            if (!requiredRoles || requiredRoles.includes(request.user.role)) {
               return true;
+            } else
+              throw new UnauthorizedException(
+                `Roles ${request.user.role} are not allowed to access this resource`,
+              );
+          })() || false
+        : (() => {
+            throw new UnauthorizedException("Token is expired");
           })()
-      : false;
+      : (() => {
+          throw new UnauthorizedException("Please login First");
+        })();
   }
 }

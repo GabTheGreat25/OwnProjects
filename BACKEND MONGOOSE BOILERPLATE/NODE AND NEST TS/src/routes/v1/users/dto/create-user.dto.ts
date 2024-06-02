@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MinLength,
-} from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 import { UploadImages } from "src/types";
 
 export class CreateUserDto {
@@ -25,7 +19,6 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 
-  @IsOptional()
   @IsNotEmpty()
   image: UploadImages[];
 }

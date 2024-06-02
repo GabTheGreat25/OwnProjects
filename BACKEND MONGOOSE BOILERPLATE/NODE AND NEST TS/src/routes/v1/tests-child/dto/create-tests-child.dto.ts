@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsMongoId, IsNotEmpty, IsString } from "class-validator";
 import { UploadImages } from "src/types";
 
 export class CreateTestsChildDto {
@@ -10,7 +10,6 @@ export class CreateTestsChildDto {
   @IsNotEmpty()
   message: string;
 
-  @IsOptional()
   @IsNotEmpty()
   image: UploadImages[];
 }
