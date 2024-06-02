@@ -9,7 +9,7 @@ const filter = new badWords();
 filter.addWords(...customBadWords);
 
 const schema = {
-  discriminatorKey: RESOURCE.ROLES,
+  discriminatorKey: RESOURCE.ROLE,
 };
 
 const customerSchema = new Schema<CustomerModel>(

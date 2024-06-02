@@ -47,31 +47,25 @@ const getSingleUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const data = await service.getAll({ _filter: { email } });
+  const data = await service.getEmail(req.body.email);
 
-  const user = data[STATUSCODE.ZERO];
+  if (!data) return responseHandler(res, [], "No User found");
 
-  if (!(await bcrypt.compare(password, user.password))) {
-    responseHandler(res, [], "Password do not match");
-    return;
-  }
-
-  const message = !user ? "No User found" : "Login success";
+  if (!(await bcrypt.compare(req.body.password, data.password)))
+    return responseHandler(res, [], "Password do not match");
 
   const accessToken = generateAccess({});
   setToken(accessToken.access);
 
-  responseHandler(res, user, message, accessToken);
+  responseHandler(res, data, "User Login successfully", accessToken);
 });
 
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   const savedToken = getToken();
-  console.log("savedToken", savedToken);
 
   if (savedToken) addTokenToBlacklist();
 
-  responseHandler(res, [], "User logout successful");
+  responseHandler(res, [], "User Logout successfully");
 });
 
 const createNewUser = [

@@ -4,7 +4,7 @@ import { RESOURCE, ROLE } from "../../../../constants";
 import { AdminModel } from "../../../../types";
 
 const schemaOptions = {
-  discriminatorKey: RESOURCE.ROLES,
+  discriminatorKey: RESOURCE.ROLE,
 };
 
 const adminSchema = new Schema<AdminModel>({}, schemaOptions);

@@ -3,7 +3,7 @@ import { RESOURCE } from "../../../constants";
 import { UserModel } from "../../../types";
 
 const schemaOptions = {
-  discriminatorKey: RESOURCE.ROLES,
+  discriminatorKey: RESOURCE.ROLE,
   timestamps: true,
 };
 

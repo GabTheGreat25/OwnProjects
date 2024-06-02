@@ -4,7 +4,7 @@ import { RESOURCE, ROLE } from "../../../../constants";
 import { EmployeeModel } from "../../../../types";
 
 const schema = {
-  discriminatorKey: RESOURCE.ROLES,
+  discriminatorKey: RESOURCE.ROLE,
 };
 
 const employeeSchema = new Schema<EmployeeModel>({}, schema);

@@ -1,10 +1,10 @@
 import model from "./model";
-import { ROLE } from "../../../constants";
 import {
   AdminDiscriminator,
   EmployeeDiscriminator,
   CustomerDiscriminator,
 } from "./discriminators";
+import { ROLE, RESOURCE } from "../../../constants";
 import {
   UserModel,
   AdminModel,
@@ -12,8 +12,8 @@ import {
   CustomerModel,
 } from "../../../types";
 
-async function getAll(_filter: any = {}) {
-  return await model.find({ deleted: false }).select("+password");
+async function getAll() {
+  return await model.find({ deleted: false });
 }
 
 async function getAllDeleted() {
@@ -22,6 +22,12 @@ async function getAllDeleted() {
 
 async function getById(_id: string) {
   return await model.findOne({ _id, deleted: false });
+}
+
+async function getEmail(email: string) {
+  return await model
+    .findOne({ email, deleted: false })
+    .select(RESOURCE.PASSWORD);
 }
 
 async function add(body: UserModel) {
@@ -57,6 +63,7 @@ export default {
   getAll,
   getAllDeleted,
   getById,
+  getEmail,
   add,
   update,
   deleteById,
