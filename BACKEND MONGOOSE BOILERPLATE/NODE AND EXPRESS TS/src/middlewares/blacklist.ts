@@ -9,7 +9,7 @@ export function getToken(): string | null {
   return jwtToken;
 }
 
-export function addTokenToBlacklist() {
+export function blacklistToken() {
   blacklistedToken = jwtToken;
 }
 

@@ -3,12 +3,12 @@ import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
 import service from "./service";
 import { ENV } from "../../../config";
-import { STATUSCODE } from "../../../constants";
+import { RESOURCE, STATUSCODE } from "../../../constants";
 import { upload, responseHandler, multipleImages } from "../../../utils";
 import {
   setToken,
   getToken,
-  addTokenToBlacklist,
+  blacklistToken,
   generateAccess,
 } from "../../../middlewares";
 
@@ -54,7 +54,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   if (!(await bcrypt.compare(req.body.password, data.password)))
     return responseHandler(res, [], "Password do not match");
 
-  const accessToken = generateAccess({});
+  const accessToken = generateAccess({ role: (data as any)[RESOURCE.ROLE] });
   setToken(accessToken.access);
 
   responseHandler(res, data, "User Login successfully", accessToken);
@@ -63,7 +63,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   const savedToken = getToken();
 
-  if (savedToken) addTokenToBlacklist();
+  if (savedToken) blacklistToken();
 
   responseHandler(res, [], "User Logout successfully");
 });

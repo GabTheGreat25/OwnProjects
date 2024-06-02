@@ -9,7 +9,6 @@ export const RESOURCE = {
   IMAGES: "projectImages",
   ID: "_id",
   ROLE: "role",
-  ROLES: "roles",
   PASSWORD: "+password",
   TESTS: "tests",
   TEST: "test",
