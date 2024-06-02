@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import service from "./service";
 import asyncHandler from "express-async-handler";
-import { STATUSCODE } from "../../../constants/index";
-import { upload } from "../../../helpers/cloudinary";
-import { responseHandler, multipleImages } from "../../../utils/index";
+import service from "./service";
+import { STATUSCODE } from "../../../constants";
+import { upload, responseHandler, multipleImages } from "../../../utils";
 
 const getAllTests = asyncHandler(async (req: Request, res: Response) => {
   const data = await service.getAll();
@@ -30,9 +29,7 @@ const getAllTestsDeleted = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getSingleTest = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const data = await service.getById(id);
+  const data = await service.getById(req.params.id);
 
   responseHandler(
     res,
@@ -44,11 +41,14 @@ const getSingleTest = asyncHandler(async (req: Request, res: Response) => {
 const createNewTest = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const images = await multipleImages(req.files as Express.Multer.File[], []);
+    const uploadedImages = await multipleImages(
+      req.files as Express.Multer.File[],
+      [],
+    );
 
     const data = await service.add({
       ...req.body,
-      image: images,
+      image: uploadedImages,
     });
 
     responseHandler(res, [data], "Test created successfully");
@@ -58,23 +58,24 @@ const createNewTest = [
 const updateTest = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const oldData = await service.getImageById(id);
+    const oldData = await service.getById(req.params.id);
 
-    const images = await multipleImages(
+    const uploadNewImages = await multipleImages(
       req.files as Express.Multer.File[],
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await service.update(id, { ...req.body, image: images });
+    const data = await service.update(req.params.id, {
+      ...req.body,
+      image: uploadNewImages,
+    });
 
     responseHandler(res, [data], "Test updated successfully");
   }),
 ];
 
 const deleteTest = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await service.deleteById(id);
+  const data = await service.deleteById(req.params.id);
 
   responseHandler(
     res,
@@ -84,8 +85,7 @@ const deleteTest = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const restoreTest = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await service.restoreById(id);
+  const data = await service.restoreById(req.params.id);
 
   responseHandler(
     res,
@@ -95,8 +95,7 @@ const restoreTest = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const forceDeleteTest = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await service.forceDelete(id);
+  const data = await service.forceDelete(req.params.id);
 
   const message = !data ? "No Test found" : "Test force deleted successfully";
 

@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import service from "./service";
 import asyncHandler from "express-async-handler";
-import { STATUSCODE } from "../../../constants/index";
-import { upload } from "../../../helpers/cloudinary";
-import { responseHandler, multipleImages } from "../../../utils/index";
+import service from "./service";
+import { STATUSCODE } from "../../../constants";
+import { upload, responseHandler, multipleImages } from "../../../utils";
 
 const getAllTestsChild = asyncHandler(async (req: Request, res: Response) => {
   const data = await service.getAll();
@@ -32,9 +31,7 @@ const getAllTestsChildDeleted = asyncHandler(
 );
 
 const getSingleTestChild = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const data = await service.getById(id);
+  const data = await service.getById(req.params.id);
 
   responseHandler(
     res,
@@ -60,23 +57,24 @@ const createNewTestChild = [
 const updateTestChild = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const oldData = await service.getImageById(id);
+    const oldData = await service.getImageById(req.params.id);
 
     const images = await multipleImages(
       req.files as Express.Multer.File[],
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await service.update(id, { ...req.body, image: images });
+    const data = await service.update(req.params.id, {
+      ...req.body,
+      image: images,
+    });
 
     responseHandler(res, [data], "Test Child updated successfully");
   }),
 ];
 
 const deleteTestChild = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await service.deleteById(id);
+  const data = await service.deleteById(req.params.id);
 
   responseHandler(
     res,
@@ -88,8 +86,7 @@ const deleteTestChild = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const restoreTestChild = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await service.restoreById(id);
+  const data = await service.restoreById(req.params.id);
 
   responseHandler(
     res,
@@ -102,8 +99,7 @@ const restoreTestChild = asyncHandler(async (req: Request, res: Response) => {
 
 const forceDeleteTestChild = asyncHandler(
   async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const data = await service.forceDelete(id);
+    const data = await service.forceDelete(req.params.id);
 
     const message = !data
       ? "No Test Child found"

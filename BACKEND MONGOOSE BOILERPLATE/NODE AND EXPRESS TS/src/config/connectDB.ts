@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { STATUSCODE } from "../constants/index";
+import { STATUSCODE } from "../constants";
 
-export default async function connectDB(url: string) {
+export async function connectDB(url: string) {
   try {
     mongoose.set("strictQuery", false);
     await mongoose.connect(url);

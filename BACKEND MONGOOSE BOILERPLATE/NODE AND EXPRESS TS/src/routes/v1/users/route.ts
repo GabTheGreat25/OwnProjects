@@ -1,21 +1,21 @@
 import { Router } from "express";
 import * as userController from "./controller";
-import { METHOD, PATH } from "../../../constants/index";
-import { verifyToken } from "../../../utils/index";
+import { METHOD, PATH } from "../../../constants";
+import { verifyJWT } from "../../../middlewares";
 
 const router = Router() as any;
 
 const userRoutes = [
   {
     method: METHOD.GET,
-    path: PATH.USERS,
-    middleware: [verifyToken],
+    path: "",
+    middleware: [verifyJWT],
     handler: userController.getAllUsers,
   },
   {
     method: METHOD.GET,
-    path: PATH.DELETED_USERS,
-    middleware: [verifyToken],
+    path: PATH.DELETED,
+    middleware: [verifyJWT],
     handler: userController.getAllUsersDeleted,
   },
   {
@@ -32,38 +32,38 @@ const userRoutes = [
   },
   {
     method: METHOD.GET,
-    path: PATH.USER_ID,
-    middleware: [verifyToken],
+    path: PATH.ID,
+    middleware: [verifyJWT],
     handler: userController.getSingleUser,
   },
   {
     method: METHOD.POST,
-    path: PATH.USERS,
+    path: "",
     middleware: [],
     handler: userController.createNewUser,
   },
   {
     method: METHOD.PATCH,
-    path: PATH.EDIT_USER_ID,
-    middleware: [verifyToken],
+    path: PATH.EDIT,
+    middleware: [verifyJWT],
     handler: userController.updateUser,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.USER_ID,
-    middleware: [verifyToken],
+    path: PATH.DELETE,
+    middleware: [verifyJWT],
     handler: userController.deleteUser,
   },
   {
     method: METHOD.PUT,
-    path: PATH.RESTORE_USER_ID,
-    middleware: [verifyToken],
+    path: PATH.RESTORE,
+    middleware: [verifyJWT],
     handler: userController.restoreUser,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.FORCE_DELETE_USER_ID,
-    middleware: [verifyToken],
+    path: PATH.FORCE_DELETE,
+    middleware: [verifyJWT],
     handler: userController.forceDeleteUser,
   },
 ];

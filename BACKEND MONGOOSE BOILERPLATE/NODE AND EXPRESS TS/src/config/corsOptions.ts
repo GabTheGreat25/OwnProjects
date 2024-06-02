@@ -1,8 +1,8 @@
-import allowedOrigins from "./allowedOrigins";
-import { STATUSCODE } from "../constants/index";
 import { CorsOptions } from "cors";
+import { allowedOrigins } from "../config/allowedOrigins";
+import { STATUSCODE } from "../constants";
 
-const corsOptions: CorsOptions = {
+export const corsOptions: CorsOptions = {
   origin: (origin, callback) =>
     allowedOrigins.indexOf(origin || "") !== STATUSCODE.NEGATIVE_ONE || !origin
       ? callback(null, true)
@@ -10,5 +10,3 @@ const corsOptions: CorsOptions = {
   credentials: true,
   exposedHeaders: ["Access-Control-Allow-Origin"],
 };
-
-export default corsOptions;

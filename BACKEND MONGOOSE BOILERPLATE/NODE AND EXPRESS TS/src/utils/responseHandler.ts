@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { MetaData } from "../types";
 
-export default function responseHandler(
+export function responseHandler(
   res: Response,
   data: any,
   message: string,

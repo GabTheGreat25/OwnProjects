@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-import ENV from "../../../config/environment";
-import service from "./service";
 import asyncHandler from "express-async-handler";
-import { STATUSCODE } from "../../../constants/index";
-import { upload } from "../../../helpers/cloudinary";
+import bcrypt from "bcrypt";
+import service from "./service";
+import { ENV } from "../../../config";
+import { STATUSCODE } from "../../../constants";
+import { upload, responseHandler, multipleImages } from "../../../utils";
 import {
+  setToken,
+  getToken,
+  addTokenToBlacklist,
   generateAccess,
-  responseHandler,
-  multipleImages,
-} from "../../../utils/index";
-import { addTokenToBlacklist } from "../../../helpers/blacklist";
+} from "../../../middlewares";
 
 const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
   const data = await service.getAll();
@@ -37,9 +37,7 @@ const getAllUsersDeleted = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const getSingleUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const data = await service.getById(id);
+  const data = await service.getById(req.params.id);
 
   responseHandler(
     res,
@@ -62,26 +60,19 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const message = !user ? "No User found" : "Login success";
 
   const accessToken = generateAccess({});
-
-  req.session.accessToken = accessToken.access;
+  setToken(accessToken.access);
 
   responseHandler(res, user, message, accessToken);
 });
 
-const logoutUser = (req: Request, res: Response) => {
-  const access = req.session.accessToken;
+const logoutUser = asyncHandler(async (req: Request, res: Response) => {
+  const savedToken = getToken();
+  console.log("savedToken", savedToken);
 
-  if (access) {
-    addTokenToBlacklist(access);
-    req.session.destroy((message) => {
-      responseHandler(
-        res,
-        [],
-        message ? "Error logging out" : "Logout Success",
-      );
-    });
-  }
-};
+  if (savedToken) addTokenToBlacklist();
+
+  responseHandler(res, [], "User logout successful");
+});
 
 const createNewUser = [
   upload.array("image"),
@@ -102,23 +93,24 @@ const createNewUser = [
 const updateUser = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const oldData = await service.getImageById(id);
+    const oldData = await service.getById(req.params.id);
 
     const images = await multipleImages(
       req.files as Express.Multer.File[],
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await service.update(id, { ...req.body, image: images });
+    const data = await service.update(req.params.id, {
+      ...req.body,
+      image: images,
+    });
 
     responseHandler(res, [data], "User updated successfully");
   }),
 ];
 
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await service.deleteById(id);
+  const data = await service.deleteById(req.params.id);
 
   responseHandler(
     res,
@@ -128,9 +120,7 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const restoreUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const data = await service.restoreById(id);
+  const data = await service.restoreById(req.params.id);
 
   responseHandler(
     res,
@@ -140,8 +130,7 @@ const restoreUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const forceDeleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await service.forceDelete(id);
+  const data = await service.forceDelete(req.params.id);
 
   const message = !data ? "No User found" : "User force deleted successfully";
 

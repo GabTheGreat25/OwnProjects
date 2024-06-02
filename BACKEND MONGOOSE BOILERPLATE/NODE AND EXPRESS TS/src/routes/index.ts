@@ -1,6 +1,6 @@
-import { RESOURCE } from "../constants/index";
-import { V1 } from "./v1/index";
 import { Express } from "express";
+import { V1 } from "./v1";
+import { RESOURCE } from "../constants";
 
 const ROUTES: any[] = [...V1];
 

@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
-import { RESOURCE } from "../../../constants/index";
-import { UserModel } from "../../../types/index";
+import { RESOURCE } from "../../../constants";
+import { UserModel } from "../../../types";
 
 const schemaOptions = {
   discriminatorKey: RESOURCE.ROLES,

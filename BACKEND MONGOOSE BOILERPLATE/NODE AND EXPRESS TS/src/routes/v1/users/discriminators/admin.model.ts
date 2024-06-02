@@ -1,12 +1,12 @@
 import { Schema } from "mongoose";
-import { RESOURCE, ROLE } from "../../../../constants/index";
-import { AdminModel } from "../../../../types/index";
 import users from "../model";
+import { RESOURCE, ROLE } from "../../../../constants";
+import { AdminModel } from "../../../../types";
 
-const schema = {
+const schemaOptions = {
   discriminatorKey: RESOURCE.ROLES,
 };
 
-const adminSchema = new Schema<AdminModel>({}, schema);
+const adminSchema = new Schema<AdminModel>({}, schemaOptions);
 
-export default users.discriminator(ROLE.ADMIN, adminSchema);
+export const AdminDiscriminator = users.discriminator(ROLE.ADMIN, adminSchema);

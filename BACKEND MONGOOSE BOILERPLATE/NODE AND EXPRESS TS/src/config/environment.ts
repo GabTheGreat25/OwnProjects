@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
-import { RESOURCE } from "../constants/index";
+import { RESOURCE } from "../constants";
 
 dotenv.config({
   path: "./src/config/.env",
 });
 
-const ENV = {
+export const ENV = {
   NODE_ENV: process.env.NODE_ENV || RESOURCE.DEVELOPMENT,
   PORT: process.env.PORT || 4000,
   DATABASE_URI:
@@ -18,5 +18,3 @@ const ENV = {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "your_api_key",
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "your_api_secret",
 };
-
-export default ENV;

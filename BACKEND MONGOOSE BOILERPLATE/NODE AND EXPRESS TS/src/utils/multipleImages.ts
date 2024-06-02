@@ -1,16 +1,14 @@
 import { v2 as cloudinary } from "cloudinary";
 import { UploadImages } from "../types";
 
-export default async function multipleImages(
+export async function multipleImages(
   files: Express.Multer.File[] | undefined,
   oldImagePublicIds: (string | undefined)[],
 ): Promise<UploadImages[]> {
   if (!files || !Array.isArray(files)) return [];
 
   for (const publicId of oldImagePublicIds) {
-    if (publicId) {
-      await cloudinary.uploader.destroy(publicId);
-    }
+    if (publicId) await cloudinary.uploader.destroy(publicId);
   }
 
   const uploadPromises = files.map((file) =>

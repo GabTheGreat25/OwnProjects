@@ -1,4 +1,4 @@
-const customBadWords = [
+export const customBadWords = [
   "anal",
   "anus",
   "arse",
@@ -139,5 +139,3 @@ const customBadWords = [
   "bantot",
   "pukinang ina mo",
 ];
-
-export default customBadWords;

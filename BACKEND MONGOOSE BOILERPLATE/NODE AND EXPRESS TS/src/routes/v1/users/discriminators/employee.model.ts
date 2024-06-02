@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
-import { RESOURCE, ROLE } from "../../../../constants/index";
-import { EmployeeModel } from "../../../../types/index";
 import users from "../model";
+import { RESOURCE, ROLE } from "../../../../constants";
+import { EmployeeModel } from "../../../../types";
 
 const schema = {
   discriminatorKey: RESOURCE.ROLES,
@@ -9,4 +9,7 @@ const schema = {
 
 const employeeSchema = new Schema<EmployeeModel>({}, schema);
 
-export default users.discriminator(ROLE.EMPLOYEE, employeeSchema);
+export const EmployeeDiscriminator = users.discriminator(
+  ROLE.EMPLOYEE,
+  employeeSchema,
+);

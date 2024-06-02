@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import ENV from "../config/environment";
+import { ENV } from "../config";
 
 export default function generateToken(
   payload: any = {},

@@ -1,15 +1,8 @@
-import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { RESOURCE } from "../constants/index";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
-import ENV from "../config/environment";
-
-cloudinary.config({
-  cloud_name: ENV.CLOUDINARY_CLOUD_NAME,
-  api_key: ENV.CLOUDINARY_API_KEY,
-  api_secret: ENV.CLOUDINARY_API_SECRET,
-});
+import { cloudinary } from "../config/cloudinary";
+import { RESOURCE } from "../constants";
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -21,6 +14,4 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage: storage });
-
-export { cloudinary, upload };
+export const upload = multer({ storage: storage });

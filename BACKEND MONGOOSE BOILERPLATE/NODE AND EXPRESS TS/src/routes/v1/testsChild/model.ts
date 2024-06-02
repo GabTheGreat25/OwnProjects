@@ -1,8 +1,8 @@
 import { Schema, model } from "mongoose";
-import { RESOURCE } from "../../../constants/index";
-import { TestChildModel } from "../../../types/index";
 import badWords from "bad-words";
-import customBadWords from "../../../utils/customBadWords";
+import { RESOURCE } from "../../../constants";
+import { TestChildModel } from "../../../types";
+import { customBadWords } from "../../../utils";
 
 const filter = new badWords();
 filter.addWords(...customBadWords);
@@ -25,7 +25,7 @@ const schema = new Schema<TestChildModel>(
         validator: function (value: string) {
           return !filter.isProfane(value);
         },
-        message: "Comments cannot contain profanity.",
+        message: "Description contains inappropriate language.",
       },
     },
     image: [
@@ -43,4 +43,4 @@ const schema = new Schema<TestChildModel>(
   schemaOptions,
 );
 
-export default model(RESOURCE.TEST_CHILD, schema);
+export default model(RESOURCE.TESTS_CHILD, schema);

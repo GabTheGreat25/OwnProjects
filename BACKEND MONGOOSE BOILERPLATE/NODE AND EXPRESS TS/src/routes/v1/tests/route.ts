@@ -1,48 +1,48 @@
 import { Router } from "express";
 import * as testController from "./controller";
-import { METHOD, PATH } from "../../../constants/index";
+import { METHOD, PATH } from "../../../constants";
 
 const router = Router() as any;
 
 const testRoutes = [
   {
     method: METHOD.GET,
-    path: PATH.TESTS,
+    path: "",
     handler: testController.getAllTests,
   },
   {
     method: METHOD.GET,
-    path: PATH.DELETED_TESTS,
+    path: PATH.DELETED,
     handler: testController.getAllTestsDeleted,
   },
   {
     method: METHOD.GET,
-    path: PATH.TEST_ID,
+    path: PATH.ID,
     handler: testController.getSingleTest,
   },
   {
     method: METHOD.POST,
-    path: PATH.TESTS,
+    path: "",
     handler: testController.createNewTest,
   },
   {
     method: METHOD.PATCH,
-    path: PATH.EDIT_TEST_ID,
+    path: PATH.EDIT,
     handler: testController.updateTest,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.TEST_ID,
+    path: PATH.DELETE,
     handler: testController.deleteTest,
   },
   {
     method: METHOD.PUT,
-    path: PATH.RESTORE_TEST_ID,
+    path: PATH.RESTORE,
     handler: testController.restoreTest,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.FORCE_DELETE_TEST_ID,
+    path: PATH.FORCE_DELETE,
     handler: testController.forceDeleteTest,
   },
 ];

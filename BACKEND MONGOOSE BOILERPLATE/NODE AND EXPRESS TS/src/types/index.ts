@@ -1,11 +1,5 @@
 import { Document } from "mongoose";
 
-declare module "express-session" {
-  interface SessionData {
-    accessToken: string;
-  }
-}
-
 export interface MetaData {
   [key: string]: any;
 }

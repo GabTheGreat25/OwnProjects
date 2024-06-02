@@ -1,7 +1,7 @@
 import { PipelineStage } from "mongoose";
-import { RESOURCE } from "../constants/index";
+import { RESOURCE } from "../constants";
 
-const lookup = (
+export const lookup = (
   from: string,
   localField: string,
   as: string,
@@ -15,5 +15,3 @@ const lookup = (
     pipeline: pipeline as any[],
   },
 });
-
-export default lookup;

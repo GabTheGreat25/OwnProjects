@@ -1,4 +1,4 @@
-export default {
+export const RESOURCE = {
   AUTH: "Auth",
   DEV: "dev",
   PRODUCTION: "production",
@@ -11,6 +11,6 @@ export default {
   ROLES: "roles",
   TESTS: "tests",
   TEST: "test",
-  TEST_CHILD: "testChild",
+  TESTS_CHILD: "testsChild",
   USERS: "users",
 };
