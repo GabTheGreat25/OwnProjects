@@ -4,12 +4,12 @@ import { CreateTestsChildDto } from "./create-tests-child.dto";
 import { UploadImages } from "src/types";
 
 export class UpdateTestsChildDto extends PartialType(CreateTestsChildDto) {
-  @IsNotEmpty()
   @IsMongoId()
+  @IsNotEmpty()
   test: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   message: string;
 
   @IsOptional()

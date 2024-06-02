@@ -27,11 +27,17 @@ export class TestsChildService {
       .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));
   }
 
-  getById(_id: string): Promise<any> {
+  getById(_id: string) {
     return this.testsChildModel
       .aggregate()
       .match({ _id: new mongoose.Types.ObjectId(_id), deleted: false })
       .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));
+  }
+
+  getImageById(_id: string) {
+    return this.testsChildModel
+      .findOne({ _id, deleted: false })
+      .select("image");
   }
 
   add(createTestsChildDto: CreateTestsChildDto) {

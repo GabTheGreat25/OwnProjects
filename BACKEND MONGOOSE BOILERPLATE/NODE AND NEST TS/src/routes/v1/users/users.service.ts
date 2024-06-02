@@ -28,8 +28,8 @@ export class UsersService {
     return this.userModel.findOne({ _id, deleted: false });
   }
 
-  async getEmail(email: string) {
-    return await this.userModel
+  getEmail(email: string) {
+    return this.userModel
       .findOne({ email, deleted: false })
       .select(RESOURCE.PASSWORD);
   }
@@ -44,8 +44,7 @@ export class UsersService {
             ? this.customerModel
             : this.userModel;
 
-    const newUser = new modelToUse(createUserDto);
-    return await newUser.save();
+    return await new modelToUse(createUserDto).save();
   }
 
   update(_id: string, updateUserDto: UpdateUserDto) {

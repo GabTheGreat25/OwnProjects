@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { filterBadWords } from "src/utils";
 import { Document, Schema as MongooseSchema } from "mongoose";
+import { filterBadWords } from "src/utils";
 import { UploadImages } from "src/types";
 
 @Schema({ timestamps: true })

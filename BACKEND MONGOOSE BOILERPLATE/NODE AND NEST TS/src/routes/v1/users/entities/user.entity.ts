@@ -1,9 +1,9 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
+import * as bcrypt from "bcrypt";
 import { RESOURCE } from "src/constants";
 import { UploadImages } from "src/types";
 import { ENV } from "src/config";
-import * as bcrypt from "bcrypt";
 
 @Schema({ timestamps: true, discriminatorKey: RESOURCE.ROLE })
 export class User extends Document {

@@ -1,8 +1,8 @@
 {
-  "name": "nestjs-mongodb",
+  "name": "node-and-nest-ts",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "CRUD API with Multiple Images, Authentication and Authorization using Node and Nest ts",
+  "author": "GabTheGreat25",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

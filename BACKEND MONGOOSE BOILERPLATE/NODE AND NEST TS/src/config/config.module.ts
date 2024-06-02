@@ -1,9 +1,8 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { ENV, storage, MongooseConfigService } from "src/config";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MulterModule } from "@nestjs/platform-express";
-
+import { ENV, storage, MongooseConfigService } from "src/config";
 @Module({
   imports: [
     ConfigModule.forRoot({

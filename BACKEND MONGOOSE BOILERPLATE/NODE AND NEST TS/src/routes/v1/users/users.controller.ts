@@ -13,14 +13,14 @@ import {
   UploadedFiles,
   UseGuards,
 } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { responseHandler, multipleImages } from "src/utils";
 import { STATUSCODE, PATH, RESOURCE, ROLE } from "src/constants";
-import { FilesInterceptor } from "@nestjs/platform-express";
-import * as bcrypt from "bcrypt";
-import { JwtService } from "@nestjs/jwt";
 import { JwtAuthGuard, TokenService, Roles } from "src/middleware";
 
 @Controller()
@@ -36,6 +36,7 @@ export class UsersController {
   @Roles(ROLE.ADMIN)
   async getUsers() {
     const data = await this.service.getAll();
+
     return responseHandler(
       data,
       data?.length === STATUSCODE.ZERO
@@ -49,6 +50,7 @@ export class UsersController {
   @Roles(ROLE.ADMIN)
   async getDeletedUsers() {
     const data = await this.service.getAllDeleted();
+
     return responseHandler(
       data,
       data?.length === STATUSCODE.ZERO
@@ -62,6 +64,7 @@ export class UsersController {
   @Roles(ROLE.ADMIN)
   async getUserById(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.getById(_id);
+
     return responseHandler(
       data,
       !data ? "No User found" : "User retrieved successfully",
@@ -70,15 +73,12 @@ export class UsersController {
 
   @Post(PATH.LOGIN)
   async loginUser(@Body() createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
-
-    const data = await this.service.getEmail(email);
+    const data = await this.service.getEmail(createUserDto.email);
 
     if (!data) return responseHandler([], "No User found");
 
-    if (!(await bcrypt.compare(password, data.password))) {
+    if (!(await bcrypt.compare(createUserDto.password, data.password)))
       return responseHandler([], "Password does not match");
-    }
 
     const accessToken = this.jwtService.sign({ role: data[RESOURCE.ROLE] });
     this.tokenService.setToken(accessToken);
@@ -94,7 +94,7 @@ export class UsersController {
 
     if (savedToken) this.tokenService.blacklistToken();
 
-    return responseHandler([], "User logout successful");
+    return responseHandler([], "User Logout successfully");
   }
 
   @Post()
@@ -104,10 +104,13 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    const uploadedImages = await multipleImages(files, []);
-    createUserDto.image = uploadedImages;
+    const uploadImages = await multipleImages(files, []);
 
-    const data = await this.service.add(createUserDto);
+    const data = await this.service.add({
+      ...createUserDto,
+      image: uploadImages,
+    });
+
     return responseHandler([data], "User created successfully");
   }
 
@@ -127,9 +130,12 @@ export class UsersController {
       files,
       oldData?.image.map((image) => image.public_id) || [],
     );
-    updateUserDto.image = uploadNewImages;
 
-    const data = await this.service.update(_id, updateUserDto);
+    const data = await this.service.update(_id, {
+      ...updateUserDto,
+      image: uploadNewImages,
+    });
+
     return responseHandler([data], "User updated successfully");
   }
 
@@ -138,6 +144,7 @@ export class UsersController {
   @Roles(ROLE.ADMIN, ROLE.EMPLOYEE)
   async deleteUser(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.deleteById(_id);
+
     return responseHandler(
       data?.deleted ? [] : [data],
       data?.deleted ? "User is already deleted" : "User deleted successfully",
@@ -149,6 +156,7 @@ export class UsersController {
   @Roles(ROLE.ADMIN, ROLE.EMPLOYEE)
   async restoreUser(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.restoreById(_id);
+
     return responseHandler(
       !data?.deleted ? [] : data,
       !data?.deleted ? "User is not deleted" : "User restored successfully",
@@ -160,11 +168,14 @@ export class UsersController {
   @Roles(ROLE.ADMIN, ROLE.EMPLOYEE)
   async forceDeleteUser(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.forceDelete(_id);
+
     const message = !data ? "No User found" : "User force deleted successfully";
+
     await multipleImages(
       [],
       data?.image ? data.image.map((image) => image.public_id) : [],
     );
+
     return responseHandler(data, message);
   }
 }

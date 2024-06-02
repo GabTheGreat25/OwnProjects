@@ -12,12 +12,12 @@ import {
   UseInterceptors,
   UploadedFiles,
 } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { TestsChildService } from "./tests-child.service";
 import { CreateTestsChildDto } from "./dto/create-tests-child.dto";
 import { UpdateTestsChildDto } from "./dto/update-tests-child.dto";
 import { responseHandler, multipleImages } from "src/utils";
 import { STATUSCODE, PATH, RESOURCE } from "src/constants";
-import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller()
 export class TestsChildController {
@@ -26,6 +26,7 @@ export class TestsChildController {
   @Get()
   async getTestsChild() {
     const data = await this.service.getAll();
+
     return responseHandler(
       data,
       data?.length === STATUSCODE.ZERO
@@ -37,6 +38,7 @@ export class TestsChildController {
   @Get(PATH.DELETED)
   async getDeletedTestsChild() {
     const data = await this.service.getAllDeleted();
+
     return responseHandler(
       data,
       data?.length === STATUSCODE.ZERO
@@ -48,6 +50,7 @@ export class TestsChildController {
   @Get(PATH.ID)
   async getTestChildById(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.getById(_id);
+
     return responseHandler(
       data,
       !data ? "No TestChild found" : "TestChild retrieved successfully",
@@ -62,9 +65,12 @@ export class TestsChildController {
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     const uploadedImages = await multipleImages(files, []);
-    createTestsChildDto.image = uploadedImages;
 
-    const data = await this.service.add(createTestsChildDto);
+    const data = await this.service.add({
+      ...createTestsChildDto,
+      image: uploadedImages,
+    });
+
     return responseHandler([data], "TestChild created successfully");
   }
 
@@ -76,21 +82,25 @@ export class TestsChildController {
     @Body() updateTestsChildDto: UpdateTestsChildDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    const oldData = await this.service.getById(_id);
+    const oldData = await this.service.getImageById(_id);
 
     const uploadNewImages = await multipleImages(
       files,
       oldData?.image.map((image) => image.public_id) || [],
     );
-    updateTestsChildDto.image = uploadNewImages;
 
-    const data = await this.service.update(_id, updateTestsChildDto);
+    const data = await this.service.update(_id, {
+      ...updateTestsChildDto,
+      image: uploadNewImages,
+    });
+
     return responseHandler([data], "TestChild updated successfully");
   }
 
   @Delete(PATH.DELETE)
   async deleteTestChild(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.deleteById(_id);
+
     return responseHandler(
       data?.deleted ? [] : [data],
       data?.deleted
@@ -102,6 +112,7 @@ export class TestsChildController {
   @Put(PATH.RESTORE)
   async restoreTestChild(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.restoreById(_id);
+
     return responseHandler(
       !data?.deleted ? [] : data,
       !data?.deleted
@@ -113,13 +124,16 @@ export class TestsChildController {
   @Delete(PATH.FORCE_DELETE)
   async forceDeleteTestChild(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.forceDelete(_id);
+
     const message = !data
       ? "No TestChild found"
       : "TestChild force deleted successfully";
+
     await multipleImages(
       [],
       data?.image ? data.image.map((image) => image.public_id) : [],
     );
+
     return responseHandler(data, message);
   }
 }

@@ -1,8 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { Reflector } from "@nestjs/core";
 import { TokenService } from "./middleware.verifyToken";
 import { ENV } from "src/config";
-import { Reflector } from "@nestjs/core";
 import { RESOURCE } from "src/constants";
 
 @Injectable()
@@ -30,9 +30,8 @@ export class JwtAuthGuard implements CanActivate {
               context.getHandler(),
             );
 
-            if (!requiredRoles || requiredRoles.includes(request.user.role)) {
+            if (!requiredRoles || requiredRoles.includes(request.user.role))
               return true;
-            }
           })()
       : false;
   }

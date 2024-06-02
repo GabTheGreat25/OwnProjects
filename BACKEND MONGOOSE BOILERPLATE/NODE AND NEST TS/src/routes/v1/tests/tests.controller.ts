@@ -12,12 +12,12 @@ import {
   UseInterceptors,
   UploadedFiles,
 } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { TestsService } from "./tests.service";
 import { CreateTestDto } from "./dto/create-test.dto";
 import { UpdateTestDto } from "./dto/update-test.dto";
 import { responseHandler, multipleImages } from "src/utils";
 import { STATUSCODE, PATH, RESOURCE } from "src/constants";
-import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller()
 export class TestsController {
@@ -26,6 +26,7 @@ export class TestsController {
   @Get()
   async getTests() {
     const data = await this.service.getAll();
+
     return responseHandler(
       data,
       data?.length === STATUSCODE.ZERO
@@ -37,6 +38,7 @@ export class TestsController {
   @Get(PATH.DELETED)
   async getDeletedTests() {
     const data = await this.service.getAllDeleted();
+
     return responseHandler(
       data,
       data?.length === STATUSCODE.ZERO
@@ -48,6 +50,7 @@ export class TestsController {
   @Get(PATH.ID)
   async getTestById(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.getById(_id);
+
     return responseHandler(
       data,
       !data ? "No Test found" : "Test retrieved successfully",
@@ -62,9 +65,12 @@ export class TestsController {
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     const uploadedImages = await multipleImages(files, []);
-    createTestDto.image = uploadedImages;
 
-    const data = await this.service.add(createTestDto);
+    const data = await this.service.add({
+      ...createTestDto,
+      image: uploadedImages,
+    });
+
     return responseHandler([data], "Test created successfully");
   }
 
@@ -82,15 +88,19 @@ export class TestsController {
       files,
       oldData?.image.map((image) => image.public_id) || [],
     );
-    updateTestDto.image = uploadNewImages;
 
-    const data = await this.service.update(_id, updateTestDto);
+    const data = await this.service.update(_id, {
+      ...updateTestDto,
+      image: uploadNewImages,
+    });
+
     return responseHandler([data], "Test updated successfully");
   }
 
   @Delete(PATH.DELETE)
   async deleteTest(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.deleteById(_id);
+
     return responseHandler(
       data?.deleted ? [] : [data],
       data?.deleted ? "Test is already deleted" : "Test deleted successfully",
@@ -100,6 +110,7 @@ export class TestsController {
   @Put(PATH.RESTORE)
   async restoreTest(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.restoreById(_id);
+
     return responseHandler(
       !data?.deleted ? [] : data,
       !data?.deleted ? "Test is not deleted" : "Test restored successfully",
@@ -109,11 +120,14 @@ export class TestsController {
   @Delete(PATH.FORCE_DELETE)
   async forceDeleteTest(@Param(RESOURCE.ID) _id: string) {
     const data = await this.service.forceDelete(_id);
+
     const message = !data ? "No Test found" : "Test force deleted successfully";
+
     await multipleImages(
       [],
       data?.image ? data.image.map((image) => image.public_id) : [],
     );
+
     return responseHandler(data, message);
   }
 }
