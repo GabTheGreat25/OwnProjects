@@ -1,4 +1,4 @@
-export default {
+export const RESOURCE = {
   AUTH: "Auth",
   DEV: "dev",
   PRODUCTION: "production",
@@ -6,11 +6,13 @@ export default {
   API: "/api/",
   V1: "v1/",
   VALIDATION_ERROR: "ValidationError",
+  NOT_FOUND: "Not Found",
   IMAGES: "projectImages",
   ID: "_id",
-  ROLES: "roles",
+  ROLE: "role",
+  PASSWORD: "+password",
   TESTS: "tests",
   TEST: "test",
-  TEST_CHILD: "testChild",
+  TESTS_CHILD: "testsChild",
   USERS: "users",
 };

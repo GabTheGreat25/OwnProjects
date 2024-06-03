@@ -1,6 +1,6 @@
-import { cloudinary } from "../helpers/cloudinary.js";
+import { v2 as cloudinary } from "cloudinary";
 
-export default async function multipleImages(files, oldImagePublicIds) {
+export async function multipleImages(files, oldImagePublicIds) {
   if (!files || !Array.isArray(files)) return [];
 
   for (const publicId of oldImagePublicIds) {

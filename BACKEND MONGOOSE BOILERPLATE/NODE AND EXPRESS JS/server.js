@@ -1,20 +1,16 @@
-import "express-async-errors";
 import express from "express";
 import { createServer } from "http";
-import connectDB from "./src/config/connectDB.js";
-import { addRoutes } from "./src/routes/index.js";
 import { addMiddlewares } from "./src/middlewares/index.js";
-import { addErrorHandler } from "./src/helpers/errorHandler.js";
-import { addSession } from "./src/utils/index.js";
-import ENV from "./src/config/environment.js";
+import { addRoutes } from "./src/routes/index.js";
+import { addErrorHandler } from "./src/utils/index.js";
+import { connectDB, ENV } from "./src/config/index.js";
 
 const app = express();
 
-const run = () => {
+function run() {
   const hostServer = createServer(app);
 
   addMiddlewares(app);
-  addSession(app);
   addRoutes(app);
   addErrorHandler(app);
 
@@ -25,6 +21,6 @@ const run = () => {
       console.log(`Host Server started on port ${ENV.PORT}`);
     });
   });
-};
+}
 
 run();

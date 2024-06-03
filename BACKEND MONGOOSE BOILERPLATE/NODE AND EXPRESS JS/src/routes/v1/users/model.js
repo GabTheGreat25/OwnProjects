@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import { RESOURCE } from "../../../constants/index.js";
 
 const schemaOptions = {
-  discriminatorKey: RESOURCE.ROLES,
+  discriminatorKey: RESOURCE.ROLE,
   timestamps: true,
 };
 

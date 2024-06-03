@@ -5,8 +5,8 @@ export async function connectDB(url: string) {
   try {
     mongoose.set("strictQuery", false);
     await mongoose.connect(url);
-  } catch (err) {
-    const mongoExit = STATUSCODE.ONE;
-    process.exit(mongoExit);
+  } catch (error) {
+    console.error(error);
+    process.exit(STATUSCODE.ONE);
   }
 }

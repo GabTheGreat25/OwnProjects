@@ -1,75 +1,78 @@
 import { Router } from "express";
 import * as userController from "./controller.js";
-import { METHOD, PATH } from "../../../constants/index.js";
-import { verifyToken } from "../../../utils/index.js";
+import { METHOD, PATH, ROLE } from "../../../constants/index.js";
+import { verifyJWT, authorizeRoles } from "../../../middlewares/index.js";
 
 const router = Router();
 
 const userRoutes = [
   {
     method: METHOD.GET,
-    path: PATH.USERS,
-    middleware: [verifyToken],
+    roles: [ROLE.ADMIN],
+    middleware: [verifyJWT],
     handler: userController.getAllUsers,
   },
   {
     method: METHOD.GET,
-    path: PATH.DELETED_USERS,
-    middleware: [verifyToken],
+    path: PATH.DELETED,
+    roles: [ROLE.ADMIN],
+    middleware: [verifyJWT],
     handler: userController.getAllUsersDeleted,
   },
   {
     method: METHOD.POST,
     path: PATH.LOGIN,
-    middleware: [],
     handler: userController.loginUser,
   },
   {
     method: METHOD.POST,
     path: PATH.LOGOUT,
-    middleware: [],
     handler: userController.logoutUser,
   },
   {
     method: METHOD.GET,
-    path: PATH.USER_ID,
-    middleware: [verifyToken],
+    path: PATH.ID,
+    roles: [ROLE.ADMIN],
+    middleware: [verifyJWT],
     handler: userController.getSingleUser,
   },
   {
     method: METHOD.POST,
-    path: PATH.USERS,
-    middleware: [],
     handler: userController.createNewUser,
   },
   {
     method: METHOD.PATCH,
-    path: PATH.EDIT_USER_ID,
-    middleware: [verifyToken],
+    path: PATH.EDIT,
+    roles: [ROLE.ADMIN, ROLE.EMPLOYEE],
+    middleware: [verifyJWT],
     handler: userController.updateUser,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.USER_ID,
-    middleware: [verifyToken],
+    path: PATH.DELETE,
+    roles: [ROLE.ADMIN, ROLE.EMPLOYEE],
+    middleware: [verifyJWT],
     handler: userController.deleteUser,
   },
   {
     method: METHOD.PUT,
-    path: PATH.RESTORE_USER_ID,
-    middleware: [verifyToken],
+    path: PATH.RESTORE,
+    roles: [ROLE.ADMIN, ROLE.EMPLOYEE],
+    middleware: [verifyJWT],
     handler: userController.restoreUser,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.FORCE_DELETE_USER_ID,
-    middleware: [verifyToken],
+    path: PATH.FORCE_DELETE,
+    roles: [ROLE.ADMIN, ROLE.EMPLOYEE],
+    middleware: [verifyJWT],
     handler: userController.forceDeleteUser,
   },
 ];
 
-userRoutes.forEach(({ method, path, middleware = [], handler }) => {
-  router[method](path, ...middleware, handler);
+userRoutes.forEach((route) => {
+  const { method, path = "", roles = [], middleware = [], handler } = route;
+  router[method](path, middleware.concat(authorizeRoles(...roles)), handler);
 });
 
 export default router;

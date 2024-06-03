@@ -1,12 +1,12 @@
 {
   "name": "node-and-express-js",
   "version": "1.0.0",
-  "description": "CRUD API with Authentication using Node and Express js",
+  "description": "CRUD API with Multiple Images, Authentication and Authorization using Node and Express js",
   "main": "server.js",
   "scripts": {
     "start": "node server",
     "format": "prettier --write \"src/**/*.js\"",
-    "dev": "nodemon server"
+    "dev": "nodemon server --watch src"
   },
   "author": "GabTheGreat25",
   "license": "ISC",
@@ -18,9 +18,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-async-errors": "^3.1.1",
     "express-async-handler": "^1.2.0",
-    "express-session": "^1.18.0",
+    "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.0",
     "morgan": "^1.10.0",

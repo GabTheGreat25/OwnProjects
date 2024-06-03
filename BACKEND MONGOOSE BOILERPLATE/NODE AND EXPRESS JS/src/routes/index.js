@@ -1,5 +1,5 @@
-import { RESOURCE } from "../constants/index.js";
 import { V1 } from "./v1/index.js";
+import { RESOURCE } from "../constants/index.js";
 
 export const routes = [...V1];
 

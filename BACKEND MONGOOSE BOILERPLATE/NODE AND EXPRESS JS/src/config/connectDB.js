@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 import { STATUSCODE } from "../constants/index.js";
-import ENV from "./environment.js";
+import { ENV } from "../config/index.js";
 
-export default async function connectDB() {
+export async function connectDB() {
   try {
     mongoose.set("strictQuery", false);
-    await mongoose.connect(url);
-  } catch (err) {
-    const mongoExit = STATUSCODE.ONE;
-    process.exit(mongoExit);
+    await mongoose.connect(ENV.DATABASE_URI);
+  } catch (error) {
+    console.error(error);
+    process.exit(STATUSCODE.ONE);
   }
 }

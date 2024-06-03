@@ -1,14 +1,14 @@
 import { Schema } from "mongoose";
-import { RESOURCE, ROLE } from "../../../../constants/index.js";
-import users from "../model.js";
 import badWords from "bad-words";
-import customBadWords from "../../../../utils/customBadWords.js";
+import users from "../model.js";
+import { customBadWords } from "../../../../utils/index.js";
+import { RESOURCE, ROLE } from "../../../../constants/index.js";
 
 const filter = new badWords();
 filter.addWords(...customBadWords);
 
-const schema = {
-  discriminatorKey: RESOURCE.ROLES,
+const schemaOptions = {
+  discriminatorKey: RESOURCE.ROLE,
 };
 
 const customerSchema = new Schema(
@@ -20,11 +20,14 @@ const customerSchema = new Schema(
         validator: function (value) {
           return !filter.isProfane(value);
         },
-        message: "Comments cannot contain profanity.",
+        message: "Description contains inappropriate language.",
       },
     },
   },
-  schema,
+  schemaOptions,
 );
 
-export default users.discriminator(ROLE.CUSTOMER, customerSchema);
+export const CustomerDiscriminator = users.discriminator(
+  ROLE.CUSTOMER,
+  customerSchema,
+);

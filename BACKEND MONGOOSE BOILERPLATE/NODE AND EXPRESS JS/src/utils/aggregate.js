@@ -1,6 +1,6 @@
 import { RESOURCE } from "../constants/index.js";
 
-const lookup = (from, localField, as, nestedLookup) => ({
+export const lookup = (from, localField, as, nestedLookup) => ({
   $lookup: {
     from,
     localField,
@@ -9,5 +9,3 @@ const lookup = (from, localField, as, nestedLookup) => ({
     pipeline: nestedLookup,
   },
 });
-
-export default lookup;

@@ -7,48 +7,46 @@ const router = Router();
 const testRoutes = [
   {
     method: METHOD.GET,
-    path: PATH.TESTS,
     handler: testController.getAllTests,
   },
   {
     method: METHOD.GET,
-    path: PATH.DELETED_TESTS,
+    path: PATH.DELETED,
     handler: testController.getAllTestsDeleted,
   },
   {
     method: METHOD.GET,
-    path: PATH.TEST_ID,
+    path: PATH.ID,
     handler: testController.getSingleTest,
   },
   {
     method: METHOD.POST,
-    path: PATH.TESTS,
     handler: testController.createNewTest,
   },
   {
     method: METHOD.PATCH,
-    path: PATH.EDIT_TEST_ID,
+    path: PATH.EDIT,
     handler: testController.updateTest,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.TEST_ID,
+    path: PATH.DELETE,
     handler: testController.deleteTest,
   },
   {
     method: METHOD.PUT,
-    path: PATH.RESTORE_TEST_ID,
+    path: PATH.RESTORE,
     handler: testController.restoreTest,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.FORCE_DELETE_TEST_ID,
+    path: PATH.FORCE_DELETE,
     handler: testController.forceDeleteTest,
   },
 ];
 
 testRoutes.forEach((route) => {
-  const { method, path, handler } = route;
+  const { method, path = "", handler } = route;
   router[method](path, handler);
 });
 

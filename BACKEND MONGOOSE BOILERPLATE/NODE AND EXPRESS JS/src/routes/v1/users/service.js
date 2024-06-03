@@ -1,8 +1,10 @@
 import model from "./model.js";
-import adminModel from "./discriminators/admin.model.js";
-import employeeModel from "./discriminators/employee.model.js";
-import customerModel from "./discriminators/customer.model.js";
-import { ROLE } from "../../../constants/index.js";
+import {
+  AdminDiscriminator,
+  EmployeeDiscriminator,
+  CustomerDiscriminator,
+} from "./discriminators/index.js";
+import { ROLE, RESOURCE } from "../../../constants/index.js";
 
 async function getAll() {
   return await model.find({ deleted: false }).select("+password");
@@ -16,43 +18,45 @@ async function getById(_id) {
   return await model.findOne({ _id, deleted: false });
 }
 
-async function getImageById(_id) {
-  return await model.findOne({ _id, deleted: false }).select("image");
+async function getEmail(email) {
+  return await model
+    .findOne({ email, deleted: false })
+    .select(RESOURCE.PASSWORD);
 }
 
 async function add(body) {
   return await (
     body.roles === ROLE.ADMIN
-      ? adminModel
+      ? AdminDiscriminator
       : body.roles === ROLE.EMPLOYEE
-        ? employeeModel
+        ? EmployeeDiscriminator
         : body.roles === ROLE.CUSTOMER
-          ? customerModel
+          ? CustomerDiscriminator
           : model
   ).create([body]);
 }
 
 async function update(_id, body) {
-  return await model.findOneAndUpdate({ _id }, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, { new: true });
 }
 
 async function deleteById(_id) {
-  return await model.findOneAndUpdate({ _id }, { deleted: true });
+  return await model.findByIdAndUpdate(_id, { deleted: true });
 }
 
 async function restoreById(_id) {
-  return await model.findOneAndUpdate({ _id }, { deleted: false });
+  return await model.findByIdAndUpdate(_id, { deleted: false });
 }
 
 async function forceDelete(_id) {
-  return await model.findOneAndDelete({ _id });
+  return await model.findByIdAndDelete(_id);
 }
 
 export default {
   getAll,
   getAllDeleted,
   getById,
-  getImageById,
+  getEmail,
   add,
   update,
   deleteById,

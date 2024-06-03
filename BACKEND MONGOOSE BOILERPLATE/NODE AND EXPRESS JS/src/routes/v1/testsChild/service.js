@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 import model from "./model.js";
-import lookup from "../../../utils/aggregate.js";
+import { lookup } from "../../../utils/index.js";
 import { RESOURCE } from "../../../constants/index.js";
 
 async function getAll() {
@@ -17,13 +18,13 @@ async function getAllDeleted() {
 }
 
 async function getById(_id) {
-  const result = await model.findOne({ _id, deleted: false });
-  return result
-    ? await model
-        .aggregate()
-        .match({ _id: result._id })
-        .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []))
-    : null;
+  return await model
+    .aggregate()
+    .match({
+      _id: new mongoose.Types.ObjectId.createFromTime(_id),
+      deleted: false,
+    })
+    .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));
 }
 
 async function getImageById(_id) {
@@ -35,19 +36,19 @@ async function add(body) {
 }
 
 async function update(_id, body) {
-  return await model.findOneAndUpdate({ _id }, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, { new: true });
 }
 
 async function deleteById(_id) {
-  return await model.findOneAndUpdate({ _id }, { deleted: true });
+  return await model.findByIdAndUpdate(_id, { deleted: true });
 }
 
 async function restoreById(_id) {
-  return await model.findOneAndUpdate({ _id }, { deleted: false });
+  return await model.findByIdAndUpdate(_id, { deleted: false });
 }
 
 async function forceDelete(_id) {
-  return await model.findOneAndDelete({ _id });
+  return await model.findByIdAndDelete(_id);
 }
 
 export default {

@@ -1,8 +1,8 @@
 import { STATUSCODE, RESOURCE } from "../constants/index.js";
-import ENV from "../config/environment.js";
+import { ENV } from "../config/index.js";
 
 const notFound = (req, res, next) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
+  const error = new Error(RESOURCE.NOT_FOUND);
   error.status = STATUSCODE.NOT_FOUND;
   next(error);
 };
@@ -17,7 +17,9 @@ const errorHandler = (error, req, res, next) => {
 
   res.status(statusCode).json({
     status: false,
-    message: error.message,
+    message: errorMessage,
+    timestamp: new Date().toISOString(),
+    url: req.originalUrl,
     stack: ENV.NODE_ENV === RESOURCE.PRODUCTION ? null : error.stack,
   });
 };

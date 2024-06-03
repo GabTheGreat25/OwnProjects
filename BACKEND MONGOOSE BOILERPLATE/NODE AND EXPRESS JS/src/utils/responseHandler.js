@@ -1,4 +1,4 @@
-export default function responseHandler(res, message, data, meta = {}) {
+export function responseHandler(res, message, data, meta = {}) {
   res.send({
     status: !!data,
     data: data || [],

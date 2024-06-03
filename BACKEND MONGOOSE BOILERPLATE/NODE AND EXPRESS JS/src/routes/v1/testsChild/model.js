@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
-import { RESOURCE } from "../../../constants/index.js";
 import badWords from "bad-words";
-import customBadWords from "../../../utils/customBadWords.js";
+import { RESOURCE } from "../../../constants/index.js";
+import { customBadWords } from "../../../utils/index.js";
 
 const filter = new badWords();
 filter.addWords(...customBadWords);
@@ -24,7 +24,7 @@ const schema = new Schema(
         validator: function (value) {
           return !filter.isProfane(value);
         },
-        message: "Comments cannot contain profanity.",
+        message: "Description contains inappropriate language.",
       },
     },
     image: [
@@ -42,4 +42,4 @@ const schema = new Schema(
   schemaOptions,
 );
 
-export default model(RESOURCE.TEST_CHILD, schema);
+export default model(RESOURCE.TESTS_CHILD, schema);

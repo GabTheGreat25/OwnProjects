@@ -13,31 +13,29 @@ async function getById(_id) {
   return await model.findOne({ _id, deleted: false });
 }
 
-async function getImageById(_id) {
-  return await model.findOne({ _id, deleted: false }).select("image");
-}
-
 async function add(body) {
   return await model.create(body);
 }
 
 async function update(_id, body) {
-  return await model.findOneAndUpdate({ _id }, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, { new: true });
 }
 
 async function deleteById(_id) {
-  return await model.findOneAndUpdate({ _id }, { deleted: true });
+  return Promise.all([
+    testChildModel.updateMany({ test: _id }, { deleted: true }),
+  ]).then(() => model.findByIdAndUpdate(_id, { deleted: true }));
 }
 
 async function restoreById(_id) {
-  return await model.findOneAndUpdate({ _id }, { deleted: false });
+  return Promise.all([
+    testChildModel.updateMany({ test: _id }, { deleted: false }),
+  ]).then(() => model.findByIdAndUpdate(_id, { deleted: false }));
 }
 
 async function forceDelete(_id) {
-  const deletedDocument = await model.findOneAndDelete({ _id });
-
-  return Promise.all([testChildModel.deleteMany({ test: _id })]).then(
-    () => deletedDocument,
+  return Promise.all([testChildModel.deleteMany({ test: _id })]).then(() =>
+    model.findByIdAndDelete(_id),
   );
 }
 
@@ -45,7 +43,6 @@ export default {
   getAll,
   getAllDeleted,
   getById,
-  getImageById,
   add,
   update,
   deleteById,

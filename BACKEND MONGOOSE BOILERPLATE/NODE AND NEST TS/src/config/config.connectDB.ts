@@ -17,8 +17,8 @@ export class MongooseConfigService implements MongooseOptionsFactory {
       await mongoose.connect(ENV.DATABASE_URI);
       this.logger.log(`Host Database connected to ${ENV.DATABASE_URI}`);
       this.logger.log(`Host Server started on port ${ENV.PORT}`);
-    } catch (err) {
-      this.logger.error(`Database connection error: ${err.message}`);
+    } catch (error) {
+      this.logger.error(`Database connection error: ${error.message}`);
       process.exit(STATUSCODE.ONE);
     }
 
