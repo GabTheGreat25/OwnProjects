@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import { createServer } from "http";
-import { addMiddleware } from "./src/middlewares";
+import { addMiddlewares } from "./src/middlewares";
 import { addRoutes } from "./src/routes";
 import { addErrorHandler } from "./src/utils";
 import { connectDB, ENV } from "./src/config";
@@ -10,7 +10,7 @@ const app: Express = express();
 function run() {
   const hostServer = createServer(app);
 
-  addMiddleware(app);
+  addMiddlewares(app);
   addRoutes(app);
   addErrorHandler(app);
 

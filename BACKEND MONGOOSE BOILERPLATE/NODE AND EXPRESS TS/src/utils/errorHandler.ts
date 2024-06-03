@@ -3,7 +3,7 @@ import { STATUSCODE, RESOURCE } from "../constants";
 import { ENV } from "../config";
 
 const notFound = (req: Request, res: Response, next: NextFunction) => {
-  const error: any = new Error(`Not Found - ${req.originalUrl}`);
+  const error: any = new Error(RESOURCE.NOT_FOUND);
   error.status = STATUSCODE.NOT_FOUND;
   next(error);
 };

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import createError from "http-errors";
 import service from "./service";
 import { STATUSCODE } from "../../../constants";
 import { upload, responseHandler, multipleImages } from "../../../utils";
@@ -45,6 +46,9 @@ const createNewTest = [
       req.files as Express.Multer.File[],
       [],
     );
+
+    if (uploadedImages.length === STATUSCODE.ZERO)
+      throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
     const data = await service.add({
       ...req.body,

@@ -8,7 +8,7 @@ import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
 import { TokenService } from "./middleware.verifyToken";
 import { ENV } from "src/config";
-import { RESOURCE } from "src/constants";
+import { RESOURCE, STATUSCODE } from "src/constants";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -20,7 +20,7 @@ export class JwtAuthGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization?.split(" ")[1];
+    const token = request.headers.authorization?.split(" ")[STATUSCODE.ONE];
 
     return token
       ? !this.tokenService.isTokenBlacklisted()

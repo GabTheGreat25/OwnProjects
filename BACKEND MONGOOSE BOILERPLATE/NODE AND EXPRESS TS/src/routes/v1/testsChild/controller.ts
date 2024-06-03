@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import createError from "http-errors";
 import service from "./service";
 import { STATUSCODE } from "../../../constants";
 import { upload, responseHandler, multipleImages } from "../../../utils";
@@ -43,11 +44,17 @@ const getSingleTestChild = asyncHandler(async (req: Request, res: Response) => {
 const createNewTestChild = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const images = await multipleImages(req.files as Express.Multer.File[], []);
+    const uploadedImages = await multipleImages(
+      req.files as Express.Multer.File[],
+      [],
+    );
+
+    if (uploadedImages.length === STATUSCODE.ZERO)
+      throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
     const data = await service.add({
       ...req.body,
-      image: images,
+      image: uploadedImages,
     });
 
     responseHandler(res, [data], "Test Child created successfully");
@@ -59,14 +66,14 @@ const updateTestChild = [
   asyncHandler(async (req, res) => {
     const oldData = await service.getImageById(req.params.id);
 
-    const images = await multipleImages(
+    const uploadNewImages = await multipleImages(
       req.files as Express.Multer.File[],
       oldData?.image.map((image) => image.public_id) || [],
     );
 
     const data = await service.update(req.params.id, {
       ...req.body,
-      image: images,
+      image: uploadNewImages,
     });
 
     responseHandler(res, [data], "Test Child updated successfully");

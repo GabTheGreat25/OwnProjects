@@ -1,5 +1,5 @@
 import { CorsOptions } from "cors";
-import { allowedOrigins } from "../config/allowedOrigins";
+import { allowedOrigins } from "../config";
 import { STATUSCODE } from "../constants";
 
 export const corsOptions: CorsOptions = {

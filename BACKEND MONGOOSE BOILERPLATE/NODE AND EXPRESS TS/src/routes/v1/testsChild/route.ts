@@ -7,7 +7,6 @@ const router = Router() as any;
 const testChildRoutes = [
   {
     method: METHOD.GET,
-    path: "",
     handler: testController.getAllTestsChild,
   },
   {
@@ -22,7 +21,6 @@ const testChildRoutes = [
   },
   {
     method: METHOD.POST,
-    path: "",
     handler: testController.createNewTestChild,
   },
   {
@@ -48,7 +46,7 @@ const testChildRoutes = [
 ];
 
 testChildRoutes.forEach((route) => {
-  const { method, path, handler } = route;
+  const { method, path = "", handler } = route;
   router[method](path, handler);
 });
 

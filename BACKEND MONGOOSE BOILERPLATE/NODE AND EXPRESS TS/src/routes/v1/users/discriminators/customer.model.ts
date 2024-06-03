@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
-import users from "../model";
 import badWords from "bad-words";
+import users from "../model";
 import { RESOURCE, ROLE } from "../../../../constants";
 import { CustomerModel } from "../../../../types";
 import { customBadWords } from "../../../../utils";
@@ -8,7 +8,7 @@ import { customBadWords } from "../../../../utils";
 const filter = new badWords();
 filter.addWords(...customBadWords);
 
-const schema = {
+const schemaOptions = {
   discriminatorKey: RESOURCE.ROLE,
 };
 
@@ -25,7 +25,7 @@ const customerSchema = new Schema<CustomerModel>(
       },
     },
   },
-  schema,
+  schemaOptions,
 );
 
 export const CustomerDiscriminator = users.discriminator(

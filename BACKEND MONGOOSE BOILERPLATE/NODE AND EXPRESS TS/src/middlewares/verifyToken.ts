@@ -1,19 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { isTokenBlacklisted } from "./blacklist";
+import createError from "http-errors";
+import { isTokenBlacklisted } from "../middlewares";
 import { ENV } from "../config";
+import { STATUSCODE } from "../constants";
 
 export function verifyJWT(
   req: Request & { user?: any },
   res: Response,
   next: NextFunction,
 ): void {
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.headers.authorization?.split(" ")[STATUSCODE.ONE];
 
   !token
-    ? next(new Error("Please login First"))
+    ? next(createError(STATUSCODE.UNAUTHORIZED, "Please login First"))
     : isTokenBlacklisted()
-      ? next(new Error("Token is expired"))
+      ? next(createError(STATUSCODE.UNAUTHORIZED, "Token is Expired"))
       : (() => {
           req.user = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
           next();
@@ -26,12 +28,13 @@ export function authorizeRoles(...allowedRoles: string[]) {
     res: Response,
     next: NextFunction,
   ) {
-    return allowedRoles.length === 0 ||
+    return allowedRoles.length === STATUSCODE.ZERO ||
       !req.user.role ||
       allowedRoles.includes(req.user.role)
       ? next()
       : next(
-          new Error(
+          createError(
+            STATUSCODE.UNAUTHORIZED,
             `Roles ${req.user.role} are not allowed to access this resource`,
           ),
         );

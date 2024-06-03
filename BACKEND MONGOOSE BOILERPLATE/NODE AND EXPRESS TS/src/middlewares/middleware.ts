@@ -14,7 +14,7 @@ export const middleware = [
   compression(),
 ];
 
-export const addMiddleware = (app: Express) => {
+export const addMiddlewares = (app: Express) => {
   middleware.forEach((middleware) => {
     app.use(middleware);
   });

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import createError from "http-errors";
 import bcrypt from "bcrypt";
 import service from "./service";
 import { ENV } from "../../../config";
@@ -49,10 +50,10 @@ const getSingleUser = asyncHandler(async (req: Request, res: Response) => {
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const data = await service.getEmail(req.body.email);
 
-  if (!data) return responseHandler(res, [], "No User found");
+  if (!data) throw createError(STATUSCODE.NOT_FOUND, "No User found");
 
   if (!(await bcrypt.compare(req.body.password, data.password)))
-    return responseHandler(res, [], "Password do not match");
+    throw createError(STATUSCODE.UNAUTHORIZED, "Password does not match");
 
   const accessToken = generateAccess({ role: (data as any)[RESOURCE.ROLE] });
   setToken(accessToken.access);
@@ -71,13 +72,19 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
 const createNewUser = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const images = await multipleImages(req.files as Express.Multer.File[], []);
+    const uploadedImages = await multipleImages(
+      req.files as Express.Multer.File[],
+      [],
+    );
     const hashed = await bcrypt.hash(req.body.password, ENV.SALT_NUMBER);
+
+    if (uploadedImages.length === STATUSCODE.ZERO)
+      throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
     const data = await service.add({
       ...req.body,
       password: hashed,
-      image: images,
+      image: uploadedImages,
     });
 
     responseHandler(res, [data], "User created successfully");
@@ -89,14 +96,14 @@ const updateUser = [
   asyncHandler(async (req: Request, res: Response) => {
     const oldData = await service.getById(req.params.id);
 
-    const images = await multipleImages(
+    const uploadNewImages = await multipleImages(
       req.files as Express.Multer.File[],
       oldData?.image.map((image) => image.public_id) || [],
     );
 
     const data = await service.update(req.params.id, {
       ...req.body,
-      image: images,
+      image: uploadNewImages,
     });
 
     responseHandler(res, [data], "User updated successfully");

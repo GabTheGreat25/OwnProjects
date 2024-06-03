@@ -22,6 +22,7 @@ const schema = new Schema<UserModel>(
       type: String,
       required: true,
       select: false,
+      minlength: 6,
     },
     image: [
       {
