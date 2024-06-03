@@ -12,6 +12,10 @@ import {
   UseInterceptors,
   UploadedFiles,
   UseGuards,
+  HttpException,
+  HttpStatus,
+  UnauthorizedException,
+  NotFoundException,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { JwtService } from "@nestjs/jwt";
@@ -75,10 +79,10 @@ export class UsersController {
   async loginUser(@Body() createUserDto: CreateUserDto) {
     const data = await this.service.getEmail(createUserDto.email);
 
-    if (!data) return responseHandler([], "No User found");
+    if (!data) throw new NotFoundException("No User Found");
 
     if (!(await bcrypt.compare(createUserDto.password, data.password)))
-      return responseHandler([], "Password does not match");
+      throw new UnauthorizedException("Password does not match");
 
     const accessToken = this.jwtService.sign({ role: data[RESOURCE.ROLE] });
     this.tokenService.setToken(accessToken);

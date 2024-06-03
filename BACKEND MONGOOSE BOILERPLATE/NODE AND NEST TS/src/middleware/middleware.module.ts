@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { JwtModule as NestJwtModule } from "@nestjs/jwt";
-import { TokenService } from "./middleware.verifyToken";
+import { TokenService } from "src/middleware";
 import { ENV } from "src/config";
 
 @Global()

@@ -1,5 +1,5 @@
-import { MetaData, ResponsePayload } from "src/types";
 import { Logger } from "@nestjs/common";
+import { MetaData, ResponsePayload } from "src/types";
 
 const logger = new Logger("ResponseHandler");
 
