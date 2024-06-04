@@ -58,7 +58,6 @@ export class TestsChildController {
   }
 
   @Post()
-  @UsePipes(new ValidationPipe())
   @UseInterceptors(FilesInterceptor("image"))
   async createTestChild(
     @Body() createTestsChildDto: CreateTestsChildDto,
@@ -75,7 +74,6 @@ export class TestsChildController {
   }
 
   @Patch(PATH.EDIT)
-  @UsePipes(new ValidationPipe())
   @UseInterceptors(FilesInterceptor("image"))
   async updateTestChild(
     @Param(RESOURCE.ID) _id: string,

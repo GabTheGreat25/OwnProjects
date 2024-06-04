@@ -12,8 +12,6 @@ import {
   UseInterceptors,
   UploadedFiles,
   UseGuards,
-  HttpException,
-  HttpStatus,
   UnauthorizedException,
   NotFoundException,
 } from "@nestjs/common";
@@ -23,6 +21,7 @@ import * as bcrypt from "bcrypt";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { LoginUserDto } from "./dto/login-user.dto";
 import { responseHandler, multipleImages } from "src/utils";
 import { STATUSCODE, PATH, RESOURCE, ROLE } from "src/constants";
 import { JwtAuthGuard, TokenService, Roles } from "src/middleware";
@@ -76,12 +75,12 @@ export class UsersController {
   }
 
   @Post(PATH.LOGIN)
-  async loginUser(@Body() createUserDto: CreateUserDto) {
-    const data = await this.service.getEmail(createUserDto.email);
+  async loginUser(@Body() loginUserDto: LoginUserDto) {
+    const data = await this.service.getEmail(loginUserDto.email);
 
     if (!data) throw new NotFoundException("No User Found");
 
-    if (!(await bcrypt.compare(createUserDto.password, data.password)))
+    if (!(await bcrypt.compare(loginUserDto.password, data.password)))
       throw new UnauthorizedException("Password does not match");
 
     const accessToken = this.jwtService.sign({ role: data[RESOURCE.ROLE] });
@@ -102,7 +101,6 @@ export class UsersController {
   }
 
   @Post()
-  @UsePipes(new ValidationPipe())
   @UseInterceptors(FilesInterceptor("image"))
   async createUser(
     @Body() createUserDto: CreateUserDto,
@@ -121,7 +119,6 @@ export class UsersController {
   @Patch(PATH.EDIT)
   @UseGuards(JwtAuthGuard)
   @Roles(ROLE.ADMIN, ROLE.EMPLOYEE)
-  @UsePipes(new ValidationPipe())
   @UseInterceptors(FilesInterceptor("image"))
   async updateUser(
     @Param(RESOURCE.ID) _id: string,

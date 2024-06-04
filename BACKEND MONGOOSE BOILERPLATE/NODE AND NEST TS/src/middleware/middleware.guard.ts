@@ -22,28 +22,33 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization?.split(" ")[STATUSCODE.ONE];
 
-    return token
-      ? !this.tokenService.isTokenBlacklisted()
+    return !token
+      ? (() => {
+          throw new UnauthorizedException("Access denied");
+        })()
+      : this.tokenService.getToken() !== token
         ? (() => {
-            request.user = this.jwtService.verify(token, {
-              secret: ENV.ACCESS_TOKEN_SECRET,
-            });
-            const requiredRoles = this.reflector.get<string[]>(
-              RESOURCE.ROLES,
-              context.getHandler(),
-            );
-            if (!requiredRoles || requiredRoles.includes(request.user.role)) {
-              return true;
-            } else
-              throw new UnauthorizedException(
-                `Roles ${request.user.role} are not allowed to access this resource`,
-              );
-          })() || false
-        : (() => {
-            throw new UnauthorizedException("Token is expired");
+            throw new UnauthorizedException("Invalid token");
           })()
-      : (() => {
-          throw new UnauthorizedException("Please login First");
-        })();
+        : this.tokenService.isTokenBlacklisted()
+          ? (() => {
+              throw new UnauthorizedException("Token is expired");
+            })()
+          : (() => {
+              request.user = this.jwtService.verify(token, {
+                secret: ENV.ACCESS_TOKEN_SECRET,
+              });
+              const requiredRoles = this.reflector.get<string[]>(
+                RESOURCE.ROLES,
+                context.getHandler(),
+              );
+              return !requiredRoles || requiredRoles.includes(request.user.role)
+                ? true
+                : (() => {
+                    throw new UnauthorizedException(
+                      `Roles ${request.user.role} are not allowed to access this resource`,
+                    );
+                  })();
+            })();
   }
 }
