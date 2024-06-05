@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
-import { isTokenBlacklisted } from "../middlewares";
+import { getToken, isTokenBlacklisted } from "../middlewares";
 import { ENV } from "../config";
 import { STATUSCODE } from "../constants";
 
@@ -13,13 +13,15 @@ export function verifyJWT(
   const token = req.headers.authorization?.split(" ")[STATUSCODE.ONE];
 
   !token
-    ? next(createError(STATUSCODE.UNAUTHORIZED, "Please login First"))
-    : isTokenBlacklisted()
-      ? next(createError(STATUSCODE.UNAUTHORIZED, "Token is Expired"))
-      : (() => {
-          req.user = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
-          next();
-        })();
+    ? next(createError(STATUSCODE.UNAUTHORIZED, "Access denied"))
+    : getToken() !== token
+      ? next(createError(STATUSCODE.UNAUTHORIZED, "Invalid token"))
+      : isTokenBlacklisted()
+        ? next(createError(STATUSCODE.UNAUTHORIZED, "Token is Expired"))
+        : (() => {
+            req.user = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
+            next();
+          })();
 }
 
 export function authorizeRoles(...allowedRoles: string[]) {

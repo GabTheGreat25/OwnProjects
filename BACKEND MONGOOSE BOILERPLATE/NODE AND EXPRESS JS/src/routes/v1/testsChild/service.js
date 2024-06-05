@@ -21,7 +21,7 @@ async function getById(_id) {
   return await model
     .aggregate()
     .match({
-      _id: new mongoose.Types.ObjectId.createFromTime(_id),
+      _id: new mongoose.Types.ObjectId(_id),
       deleted: false,
     })
     .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));

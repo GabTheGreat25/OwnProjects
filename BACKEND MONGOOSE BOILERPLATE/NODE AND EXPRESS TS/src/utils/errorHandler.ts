@@ -26,7 +26,7 @@ const errorHandler = (
     message: errorMessage,
     timestamp: new Date().toISOString(),
     url: req.originalUrl,
-    stack: ENV.NODE_ENV === RESOURCE.PRODUCTION ? null : error.stack,
+    stack: ENV.NODE_ENV === RESOURCE.PRODUCTION ? undefined : error.stack,
   });
 };
 
