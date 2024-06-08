@@ -30,7 +30,10 @@ export class TestsChildService {
   getById(_id: string) {
     return this.testsChildModel
       .aggregate()
-      .match({ _id: new mongoose.Types.ObjectId(_id), deleted: false })
+      .match({
+        _id: mongoose.Types.ObjectId.createFromHexString(_id),
+        deleted: false,
+      })
       .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));
   }
 
@@ -47,6 +50,7 @@ export class TestsChildService {
   update(_id: string, updateTestsChildDto: UpdateTestsChildDto) {
     return this.testsChildModel.findByIdAndUpdate(_id, updateTestsChildDto, {
       new: true,
+      runValidators: true,
     });
   }
 

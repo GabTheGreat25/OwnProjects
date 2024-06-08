@@ -19,7 +19,10 @@ async function add(body: TestModel) {
 }
 
 async function update(_id: string, body: TestModel) {
-  return await model.findByIdAndUpdate(_id, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, {
+    new: true,
+    runValidators: true,
+  });
 }
 
 async function deleteById(_id: string) {

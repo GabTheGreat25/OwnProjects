@@ -1,8 +1,8 @@
+import { Express } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import logger from "morgan";
 import compression from "compression";
-import { Express } from "express";
 import { corsOptions } from "../config";
 import { RESOURCE } from "../constants";
 

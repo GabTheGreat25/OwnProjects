@@ -48,7 +48,10 @@ export class UsersService {
   }
 
   update(_id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel.findByIdAndUpdate(_id, updateUserDto, { new: true });
+    return this.userModel.findByIdAndUpdate(_id, updateUserDto, {
+      new: true,
+      runValidators: true,
+    });
   }
 
   deleteById(_id: string) {

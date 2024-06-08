@@ -7,7 +7,7 @@ import {
 import { ROLE, RESOURCE } from "../../../constants/index.js";
 
 async function getAll() {
-  return await model.find({ deleted: false }).select("+password");
+  return await model.find({ deleted: false });
 }
 
 async function getAllDeleted() {
@@ -37,7 +37,10 @@ async function add(body) {
 }
 
 async function update(_id, body) {
-  return await model.findByIdAndUpdate(_id, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, {
+    new: true,
+    runValidators: true,
+  });
 }
 
 async function deleteById(_id) {

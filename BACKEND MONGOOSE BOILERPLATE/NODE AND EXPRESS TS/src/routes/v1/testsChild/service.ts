@@ -21,7 +21,10 @@ async function getAllDeleted() {
 async function getById(_id: string) {
   return await model
     .aggregate()
-    .match({ _id: new mongoose.Types.ObjectId(_id), deleted: false })
+    .match({
+      _id: mongoose.Types.ObjectId.createFromHexString(_id),
+      deleted: false,
+    })
     .append(lookup(RESOURCE.TESTS, RESOURCE.TEST, RESOURCE.TEST, []));
 }
 
@@ -34,7 +37,10 @@ async function add(body: TestChildModel) {
 }
 
 async function update(_id: string, body: TestChildModel) {
-  return await model.findByIdAndUpdate(_id, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, {
+    new: true,
+    runValidators: true,
+  });
 }
 
 async function deleteById(_id: string) {

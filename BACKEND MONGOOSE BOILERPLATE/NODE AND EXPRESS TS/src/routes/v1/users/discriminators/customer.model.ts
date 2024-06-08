@@ -21,7 +21,7 @@ const customerSchema = new Schema<CustomerModel>(
         validator: function (value: string) {
           return !filter.isProfane(value);
         },
-        message: "Comments cannot contain profanity.",
+        message: "Description contains inappropriate language.",
       },
     },
   },

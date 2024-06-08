@@ -30,7 +30,10 @@ export class TestsService {
   }
 
   update(_id: string, updateTestDto: UpdateTestDto) {
-    return this.testModel.findByIdAndUpdate(_id, updateTestDto, { new: true });
+    return this.testModel.findByIdAndUpdate(_id, updateTestDto, {
+      new: true,
+      runValidators: true,
+    });
   }
 
   async deleteById(_id: string) {

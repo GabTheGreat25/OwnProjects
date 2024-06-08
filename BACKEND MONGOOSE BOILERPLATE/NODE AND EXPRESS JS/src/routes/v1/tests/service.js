@@ -18,7 +18,10 @@ async function add(body) {
 }
 
 async function update(_id, body) {
-  return await model.findByIdAndUpdate(_id, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, {
+    new: true,
+    runValidators: true,
+  });
 }
 
 async function deleteById(_id) {

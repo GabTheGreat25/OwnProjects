@@ -44,7 +44,10 @@ async function add(body: UserModel) {
 }
 
 async function update(_id: string, body: UserModel) {
-  return await model.findByIdAndUpdate(_id, body, { new: true });
+  return await model.findByIdAndUpdate(_id, body, {
+    new: true,
+    runValidators: true,
+  });
 }
 
 async function deleteById(_id: string) {
