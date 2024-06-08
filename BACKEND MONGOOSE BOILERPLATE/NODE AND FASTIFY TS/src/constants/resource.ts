@@ -1,0 +1,18 @@
+export const RESOURCE = {
+  AUTH: "Auth",
+  DEV: "dev",
+  PRODUCTION: "production",
+  DEVELOPMENT: "development",
+  API: "/api/",
+  V1: "v1/",
+  VALIDATION_ERROR: "ValidationError",
+  NOT_FOUND: "Not Found",
+  IMAGES: "projectImages",
+  ID: "_id",
+  ROLE: "role",
+  PASSWORD: "+password",
+  TESTS: "tests",
+  TEST: "test",
+  TESTS_CHILD: "testsChild",
+  USERS: "users",
+};
