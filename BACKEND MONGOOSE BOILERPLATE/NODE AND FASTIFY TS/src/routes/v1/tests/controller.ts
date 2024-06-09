@@ -1,9 +1,12 @@
+import { FastifyReply, FastifyRequest } from "fastify";
+import { MultipartFile } from "@fastify/multipart";
 import createError from "http-errors";
-import service from "./service.js";
+import service from "./service";
 import { STATUSCODE } from "../../../constants/index.js";
 import { responseHandler, multipleImages } from "../../../utils/index.js";
+import { TestModel } from "../../../types";
 
-const getAllTests = async (req, reply) => {
+const getAllTests = async (req: FastifyRequest, reply: FastifyReply) => {
   const data = await service.getAll();
 
   responseHandler(
@@ -16,7 +19,7 @@ const getAllTests = async (req, reply) => {
   );
 };
 
-const getAllTestsDeleted = async (req, reply) => {
+const getAllTestsDeleted = async (req: FastifyRequest, reply: FastifyReply) => {
   const data = await service.getAllDeleted();
 
   responseHandler(
@@ -29,7 +32,10 @@ const getAllTestsDeleted = async (req, reply) => {
   );
 };
 
-const getSingleTest = async (req, reply) => {
+const getSingleTest = async (
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+) => {
   const data = await service.getById(req.params.id);
 
   responseHandler(
@@ -40,8 +46,14 @@ const getSingleTest = async (req, reply) => {
   );
 };
 
-const createNewTest = async (req, reply) => {
-  const uploadedImages = await multipleImages(req.files, []);
+const createNewTest = async (
+  req: FastifyRequest<{ Body: TestModel }>,
+  reply: FastifyReply,
+) => {
+  const uploadedImages = await multipleImages(
+    req.files as unknown as MultipartFile[],
+    [],
+  );
 
   if (uploadedImages.length === STATUSCODE.ZERO)
     throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
@@ -54,11 +66,14 @@ const createNewTest = async (req, reply) => {
   responseHandler(req, reply, [data], "Test created successfully");
 };
 
-const updateTest = async (req, reply) => {
+const updateTest = async (
+  req: FastifyRequest<{ Params: { id: string }; Body: TestModel }>,
+  reply: FastifyReply,
+) => {
   const oldData = await service.getById(req.params.id);
 
   const uploadNewImages = await multipleImages(
-    req.files,
+    req.files as unknown as MultipartFile[],
     oldData?.image.map((image) => image.public_id) || [],
   );
 
@@ -70,7 +85,10 @@ const updateTest = async (req, reply) => {
   responseHandler(req, reply, [data], "Test updated successfully");
 };
 
-const deleteTest = async (req, reply) => {
+const deleteTest = async (
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+) => {
   const data = await service.deleteById(req.params.id);
 
   responseHandler(
@@ -81,7 +99,10 @@ const deleteTest = async (req, reply) => {
   );
 };
 
-const restoreTest = async (req, reply) => {
+const restoreTest = async (
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+) => {
   const data = await service.restoreById(req.params.id);
 
   responseHandler(
@@ -92,7 +113,10 @@ const restoreTest = async (req, reply) => {
   );
 };
 
-const forceDeleteTest = async (req, reply) => {
+const forceDeleteTest = async (
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply,
+) => {
   const data = await service.forceDelete(req.params.id);
 
   const message = !data ? "No Test found" : "Test force deleted successfully";

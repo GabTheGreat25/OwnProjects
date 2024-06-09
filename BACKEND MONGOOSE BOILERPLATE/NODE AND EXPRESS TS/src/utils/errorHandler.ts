@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction, Express } from "express";
+import createError from "http-errors";
 import { STATUSCODE, RESOURCE } from "../constants";
 import { ENV } from "../config";
 
 const notFound = (req: Request, res: Response, next: NextFunction) => {
-  const error: any = new Error(RESOURCE.NOT_FOUND);
-  error.status = STATUSCODE.NOT_FOUND;
-  next(error);
+  next(createError(STATUSCODE.NOT_FOUND, RESOURCE.NOT_FOUND));
 };
 
 const errorHandler = (

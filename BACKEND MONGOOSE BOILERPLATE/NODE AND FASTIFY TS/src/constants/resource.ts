@@ -1,6 +1,5 @@
 export const RESOURCE = {
   AUTH: "Auth",
-  DEV: "dev",
   PRODUCTION: "production",
   DEVELOPMENT: "development",
   API: "/api/",

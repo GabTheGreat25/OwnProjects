@@ -1,4 +1,4 @@
-export function responseHandler(app, reply, data, message, meta = {}) {
+export function responseHandler(req, reply, data, message, meta = {}) {
   const response = {
     status: !!data,
     data: data || [],
@@ -6,7 +6,7 @@ export function responseHandler(app, reply, data, message, meta = {}) {
     meta: meta,
   };
 
-  app.log.info(`Response: ${JSON.stringify(response)}`);
+  req.log.info(`Response: ${JSON.stringify(response)}`);
 
   reply.send(response);
 }

@@ -2,7 +2,7 @@ import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import { UploadImages } from "../types";
 
 export async function multipleImages(
-  files: Express.Multer.File[] | undefined,
+  files: any[] | undefined,
   oldImagePublicIds: (string | undefined)[],
 ): Promise<UploadImages[]> {
   if (!files || !Array.isArray(files)) return [];

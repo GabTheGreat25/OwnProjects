@@ -5,6 +5,7 @@
   "scripts": {
     "build": "npx tsc",
     "format": "prettier --write \"src/**/*.ts\"",
+    "start": "ts-node server.ts",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\""
   },
   "author": "GabTheGreat25",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@types/bad-words": "^3.0.3",
     "@types/bcrypt": "^5.0.2",
+    "@types/http-errors": "^2.0.4",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20.12.12",

@@ -1,11 +1,15 @@
 import { allowedOrigins } from "../config/index.js";
 import { STATUSCODE } from "../constants/index.js";
+import createError from "http-errors";
 
 export const corsOptions = {
   origin: (origin, callback) =>
-    allowedOrigins.indexOf(origin || "") !== STATUSCODE.NEGATIVE_ONE || !origin
+    !origin || allowedOrigins.indexOf(origin) !== STATUSCODE.NEGATIVE_ONE
       ? callback(null, true)
-      : callback(new Error("Not allowed by CORS")),
+      : callback(
+          createError(STATUSCODE.FORBIDDEN, "Not allowed by CORS"),
+          false,
+        ),
   credentials: true,
   exposedHeaders: ["Access-Control-Allow-Origin"],
 };
