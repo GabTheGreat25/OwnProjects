@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import createError from "http-errors";
-import { STATUSCODE, RESOURCE } from "../constants/index.js";
-import { ENV } from "../config/index.js";
+import { STATUSCODE, RESOURCE } from "../constants";
+import { ENV } from "../config";
 
 const notFound = (req: FastifyRequest, reply: FastifyReply) => {
   reply.send(createError(STATUSCODE.NOT_FOUND, RESOURCE.NOT_FOUND));

@@ -13,7 +13,7 @@ const schemaOptions = {
 
 const customerSchema = new Schema(
   {
-    details: {
+    description: {
       type: String,
       required: true,
       validate: {

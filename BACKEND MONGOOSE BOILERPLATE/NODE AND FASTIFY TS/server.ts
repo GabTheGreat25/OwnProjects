@@ -1,7 +1,7 @@
 import { fastify, FastifyInstance } from "fastify";
-import { addMiddlewares } from "./src/middlewares/index";
-import { addRoutes } from "./src/routes/index";
-import { addErrorHandler } from "./src/utils/index";
+import { addMiddlewares } from "./src/middlewares";
+import { addRoutes } from "./src/routes";
+import { addErrorHandler } from "./src/utils";
 import { connectDB, ENV } from "./src/config";
 
 const app: FastifyInstance = fastify({ logger: true });

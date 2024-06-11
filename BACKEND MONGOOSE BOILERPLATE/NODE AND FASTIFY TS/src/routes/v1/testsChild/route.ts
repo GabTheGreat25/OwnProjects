@@ -14,43 +14,43 @@ import { Route } from "../../../types";
 const routes: Route[] = [
   {
     method: METHOD.GET,
-    handler: testController.getAllTests,
+    handler: testController.getAllTestsChild,
   },
   {
     method: METHOD.GET,
     path: PATH.DELETED,
-    handler: testController.getAllTestsDeleted,
+    handler: testController.getAllTestsChildDeleted,
   },
   {
     method: METHOD.GET,
     path: PATH.ID,
-    handler: testController.getSingleTest,
+    handler: testController.getSingleTestChild,
   },
   {
     method: METHOD.POST,
-    handler: testController.createNewTest,
+    handler: testController.createNewTestChild,
     preHandler: upload.array("image"),
   },
   {
     method: METHOD.PATCH,
     path: PATH.EDIT,
-    handler: testController.updateTest,
+    handler: testController.updateTestChild,
     preHandler: upload.array("image"),
   },
   {
     method: METHOD.DELETE,
     path: PATH.DELETE,
-    handler: testController.deleteTest,
+    handler: testController.deleteTestChild,
   },
   {
     method: METHOD.PUT,
     path: PATH.RESTORE,
-    handler: testController.restoreTest,
+    handler: testController.restoreTestChild,
   },
   {
     method: METHOD.DELETE,
     path: PATH.FORCE_DELETE,
-    handler: testController.forceDeleteTest,
+    handler: testController.forceDeleteTestChild,
   },
 ];
 

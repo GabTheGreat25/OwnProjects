@@ -1,5 +1,3 @@
-import { Document } from "mongoose";
-
 export interface MetaData {
   [key: string]: any;
 }
@@ -25,7 +23,7 @@ export interface TestChildModel {
   deleted?: boolean;
 }
 
-export interface UserModel extends Document {
+export interface UserModel {
   _id?: string;
   name: string;
   email: string;
@@ -44,5 +42,5 @@ export interface EmployeeModel extends UserModel {
 
 export interface CustomerModel extends UserModel {
   roles?: string;
-  details: string;
+  description: string;
 }

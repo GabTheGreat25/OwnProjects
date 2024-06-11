@@ -1,10 +1,20 @@
-import testsRoute from "./tests/route.js";
-import { RESOURCE } from "../../constants/index.js";
+import testsRoute from "./tests/route";
+import testChildRoute from "./testsChild/route";
+import userRoutes from "./users/route";
+import { RESOURCE } from "../../constants";
 
 const routes = [
   {
     url: RESOURCE.TESTS,
     route: testsRoute,
+  },
+  {
+    url: RESOURCE.TESTS_CHILD,
+    route: testChildRoute,
+  },
+  {
+    url: RESOURCE.USERS,
+    route: userRoutes,
   },
 ];
 

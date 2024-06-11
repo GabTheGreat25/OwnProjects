@@ -3,11 +3,11 @@ import { UploadImages } from "../types";
 
 export async function multipleImages(
   files: any[] | undefined,
-  oldImagePublicIds: (string | undefined)[],
+  oldImagePublicIds: (string | null | undefined)[] | undefined,
 ): Promise<UploadImages[]> {
   if (!files || !Array.isArray(files)) return [];
 
-  for (const publicId of oldImagePublicIds) {
+  for (const publicId of oldImagePublicIds || []) {
     if (publicId) await cloudinary.uploader.destroy(publicId);
   }
 

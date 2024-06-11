@@ -1,8 +1,8 @@
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v4 as uuidv4 } from "uuid";
 import multer from "fastify-multer";
-import { cloudinary } from "../config/index.js";
-import { RESOURCE } from "../constants/index.js";
+import { cloudinary } from "../config";
+import { RESOURCE } from "../constants";
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,

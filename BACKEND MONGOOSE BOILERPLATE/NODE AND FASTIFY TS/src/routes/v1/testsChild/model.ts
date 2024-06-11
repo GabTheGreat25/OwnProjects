@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import badWords from "bad-words";
 import { RESOURCE } from "../../../constants";
 import { customBadWords } from "../../../utils";
-import { TestModel } from "../../../types";
+import { TestChildModel } from "../../../types";
 
 const filter = new badWords();
 filter.addWords(...customBadWords);
@@ -11,8 +11,13 @@ const schemaOptions = {
   timestamps: true,
 };
 
-const schema = new Schema<TestModel>(
+const schema = new Schema<TestChildModel>(
   {
+    test: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: RESOURCE.TESTS,
+    },
     message: {
       type: String,
       required: true,
@@ -38,4 +43,4 @@ const schema = new Schema<TestModel>(
   schemaOptions,
 );
 
-export default model(RESOURCE.TESTS, schema);
+export default model(RESOURCE.TESTS_CHILD, schema);

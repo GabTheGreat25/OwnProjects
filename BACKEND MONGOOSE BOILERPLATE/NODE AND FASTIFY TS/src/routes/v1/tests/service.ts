@@ -1,5 +1,5 @@
 import model from "./model";
-// import testChildModel from "../testsChild/model";
+import testChildModel from "../testsChild/model";
 import { TestModel } from "../../../types";
 
 async function getAll() {
@@ -26,34 +26,22 @@ async function update(_id: string, body: TestModel) {
 }
 
 async function deleteById(_id: string) {
-  return await model.findByIdAndUpdate(_id, { deleted: true });
+  return Promise.all([
+    testChildModel.updateMany({ test: _id }, { deleted: true }),
+  ]).then(() => model.findByIdAndUpdate(_id, { deleted: true }));
 }
 
 async function restoreById(_id: string) {
-  return await model.findByIdAndUpdate(_id, { deleted: false });
+  return Promise.all([
+    testChildModel.updateMany({ test: _id }, { deleted: false }),
+  ]).then(() => model.findByIdAndUpdate(_id, { deleted: false }));
 }
 
 async function forceDelete(_id: string) {
-  return await model.findByIdAndDelete(_id);
+  return Promise.all([testChildModel.deleteMany({ test: _id })]).then(() =>
+    model.findByIdAndDelete(_id),
+  );
 }
-
-// async function deleteById(_id: string) {
-//   return Promise.all([
-//     testChildModel.updateMany({ test: _id }, { deleted: true }),
-//   ]).then(() => model.findByIdAndUpdate(_id, { deleted: true }));
-// }
-
-// async function restoreById(_id: string) {
-//   return Promise.all([
-//     testChildModel.updateMany({ test: _id }, { deleted: false }),
-//   ]).then(() => model.findByIdAndUpdate(_id, { deleted: false }));
-// }
-
-// async function forceDelete(_id: string) {
-//   return Promise.all([testChildModel.deleteMany({ test: _id })]).then(() =>
-//     model.findByIdAndDelete(_id),
-//   );
-// }
 
 export default {
   getAll,

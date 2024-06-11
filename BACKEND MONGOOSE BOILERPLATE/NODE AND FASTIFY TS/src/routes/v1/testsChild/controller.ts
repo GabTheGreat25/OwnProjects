@@ -4,9 +4,9 @@ import createError from "http-errors";
 import service from "./service";
 import { STATUSCODE } from "../../../constants";
 import { responseHandler, multipleImages } from "../../../utils";
-import { TestModel } from "../../../types";
+import { TestChildModel } from "../../../types";
 
-const getAllTests = async (req: FastifyRequest, reply: FastifyReply) => {
+const getAllTestsChild = async (req: FastifyRequest, reply: FastifyReply) => {
   const data = await service.getAll();
 
   responseHandler(
@@ -14,12 +14,15 @@ const getAllTests = async (req: FastifyRequest, reply: FastifyReply) => {
     reply,
     data,
     data?.length === STATUSCODE.ZERO
-      ? "No Tests found"
-      : "All Tests retrieved successfully",
+      ? "No TestsChild found"
+      : "All TestsChild retrieved successfully",
   );
 };
 
-const getAllTestsDeleted = async (req: FastifyRequest, reply: FastifyReply) => {
+const getAllTestsChildDeleted = async (
+  req: FastifyRequest,
+  reply: FastifyReply,
+) => {
   const data = await service.getAllDeleted();
 
   responseHandler(
@@ -27,12 +30,12 @@ const getAllTestsDeleted = async (req: FastifyRequest, reply: FastifyReply) => {
     reply,
     data,
     data?.length === STATUSCODE.ZERO
-      ? "No Deleted Tests found"
-      : "All Deleted Tests retrieved successfully",
+      ? "No Deleted TestsChild found"
+      : "All Deleted TestsChild retrieved successfully",
   );
 };
 
-const getSingleTest = async (
+const getSingleTestChild = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
@@ -42,12 +45,12 @@ const getSingleTest = async (
     req,
     reply,
     data,
-    !data ? "No Test found" : "Test retrieved successfully",
+    !data ? "No TestChild found" : "TestChild retrieved successfully",
   );
 };
 
-const createNewTest = async (
-  req: FastifyRequest<{ Body: TestModel }>,
+const createNewTestChild = async (
+  req: FastifyRequest<{ Body: TestChildModel }>,
   reply: FastifyReply,
 ) => {
   const uploadedImages = await multipleImages(
@@ -63,14 +66,14 @@ const createNewTest = async (
     image: uploadedImages,
   });
 
-  responseHandler(req, reply, [data], "Test created successfully");
+  responseHandler(req, reply, [data], "TestChild created successfully");
 };
 
-const updateTest = async (
-  req: FastifyRequest<{ Params: { id: string }; Body: TestModel }>,
+const updateTestChild = async (
+  req: FastifyRequest<{ Params: { id: string }; Body: TestChildModel }>,
   reply: FastifyReply,
 ) => {
-  const oldData = await service.getById(req.params.id);
+  const oldData = await service.getImageById(req.params.id);
 
   const uploadNewImages = await multipleImages(
     req.files as unknown as MultipartFile[],
@@ -82,24 +85,25 @@ const updateTest = async (
     image: uploadNewImages,
   });
 
-  responseHandler(req, reply, [data], "Test updated successfully");
+  responseHandler(req, reply, [data], "TestChild updated successfully");
 };
 
-const deleteTest = async (
+const deleteTestChild = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
   const data = await service.deleteById(req.params.id);
-
   responseHandler(
     req,
     reply,
     data?.deleted ? [] : [data],
-    data?.deleted ? "Test is already deleted" : "Test deleted successfully",
+    data?.deleted
+      ? "TestChild is already deleted"
+      : "TestChild deleted successfully",
   );
 };
 
-const restoreTest = async (
+const restoreTestChild = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
@@ -109,17 +113,21 @@ const restoreTest = async (
     req,
     reply,
     !data?.deleted ? [] : data,
-    !data?.deleted ? "Test is not deleted" : "Test restored successfully",
+    !data?.deleted
+      ? "TestChild is not deleted"
+      : "TestChild restored successfully",
   );
 };
 
-const forceDeleteTest = async (
+const forceDeleteTestChild = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
   const data = await service.forceDelete(req.params.id);
 
-  const message = !data ? "No Test found" : "Test force deleted successfully";
+  const message = !data
+    ? "No TestChild found"
+    : "TestChild force deleted successfully";
 
   await multipleImages(
     [],
@@ -130,12 +138,12 @@ const forceDeleteTest = async (
 };
 
 export {
-  getAllTests,
-  getAllTestsDeleted,
-  getSingleTest,
-  createNewTest,
-  updateTest,
-  deleteTest,
-  restoreTest,
-  forceDeleteTest,
+  getAllTestsChild,
+  getAllTestsChildDeleted,
+  getSingleTestChild,
+  createNewTestChild,
+  updateTestChild,
+  deleteTestChild,
+  restoreTestChild,
+  forceDeleteTestChild,
 };

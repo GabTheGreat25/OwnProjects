@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import fastifyMultipart from "@fastify/multipart";
-import { V1 } from "./v1/index.js";
-import { RESOURCE } from "../constants/index.js";
+import { V1 } from "./v1";
+import { RESOURCE } from "../constants";
 
 const ROUTES: any[] = [...V1];
 
