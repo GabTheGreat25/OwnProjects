@@ -30,7 +30,7 @@ async function getEmail(email: string) {
     .select(RESOURCE.PASSWORD);
 }
 
-async function add(body: UserModel) {
+async function add(body: UserModel, session: any) {
   const modelToUse =
     (body as AdminModel).roles === ROLE.ADMIN
       ? AdminDiscriminator
@@ -40,26 +40,27 @@ async function add(body: UserModel) {
           ? CustomerDiscriminator
           : model;
 
-  return await (modelToUse as typeof model).create(body);
+  return await (modelToUse as typeof model).create([body], { session });
 }
 
-async function update(_id: string, body: UserModel) {
+async function update(_id: string, body: UserModel, session: any) {
   return await model.findByIdAndUpdate(_id, body, {
     new: true,
     runValidators: true,
+    session,
   });
 }
 
-async function deleteById(_id: string) {
-  return await model.findByIdAndUpdate(_id, { deleted: true });
+async function deleteById(_id: string, session: any) {
+  return await model.findByIdAndUpdate(_id, { deleted: true }, { session });
 }
 
-async function restoreById(_id: string) {
-  return await model.findByIdAndUpdate(_id, { deleted: false });
+async function restoreById(_id: string, session: any) {
+  return await model.findByIdAndUpdate(_id, { deleted: false }, { session });
 }
 
-async function forceDelete(_id: string) {
-  return await model.findByIdAndDelete(_id);
+async function forceDelete(_id: string, session: any) {
+  return await model.findByIdAndDelete(_id, { session });
 }
 
 export default {

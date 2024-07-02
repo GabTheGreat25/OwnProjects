@@ -14,7 +14,7 @@ async function getById(_id) {
 }
 
 async function add(body, session) {
-  return await model.create([{ ...body }], { session });
+  return await model.create([body], { session });
 }
 
 async function update(_id, body, session) {

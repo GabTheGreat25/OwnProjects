@@ -4,6 +4,7 @@ import createError from "http-errors";
 import service from "./service";
 import { STATUSCODE } from "../../../constants";
 import { upload, responseHandler, multipleImages } from "../../../utils";
+import { Session } from "inspector";
 
 const getAllTests = asyncHandler(async (req: Request, res: Response) => {
   const data = await service.getAll();
@@ -42,6 +43,7 @@ const getSingleTest = asyncHandler(async (req: Request, res: Response) => {
 const createNewTest = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
+    const session = req.session;
     const uploadedImages = await multipleImages(
       req.files as Express.Multer.File[],
       [],
@@ -50,10 +52,13 @@ const createNewTest = [
     if (uploadedImages.length === STATUSCODE.ZERO)
       throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
-    const data = await service.add({
-      ...req.body,
-      image: uploadedImages,
-    });
+    const data = await service.add(
+      {
+        ...req.body,
+        image: uploadedImages,
+      },
+      session,
+    );
 
     responseHandler(res, [data], "Test created successfully");
   }),
@@ -62,6 +67,7 @@ const createNewTest = [
 const updateTest = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
+    const session = req.session;
     const oldData = await service.getById(req.params.id);
 
     const uploadNewImages = await multipleImages(
@@ -69,17 +75,22 @@ const updateTest = [
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await service.update(req.params.id, {
-      ...req.body,
-      image: uploadNewImages,
-    });
+    const data = await service.update(
+      req.params.id,
+      {
+        ...req.body,
+        image: uploadNewImages,
+      },
+      session,
+    );
 
     responseHandler(res, [data], "Test updated successfully");
   }),
 ];
 
 const deleteTest = asyncHandler(async (req: Request, res: Response) => {
-  const data = await service.deleteById(req.params.id);
+  const session = req.session;
+  const data = await service.deleteById(req.params.id, session);
 
   responseHandler(
     res,
@@ -89,7 +100,8 @@ const deleteTest = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const restoreTest = asyncHandler(async (req: Request, res: Response) => {
-  const data = await service.restoreById(req.params.id);
+  const session = req.session;
+  const data = await service.restoreById(req.params.id, session);
 
   responseHandler(
     res,
@@ -99,7 +111,8 @@ const restoreTest = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const forceDeleteTest = asyncHandler(async (req: Request, res: Response) => {
-  const data = await service.forceDelete(req.params.id);
+  const session = req.session;
+  const data = await service.forceDelete(req.params.id, session);
 
   const message = !data ? "No Test found" : "Test force deleted successfully";
 

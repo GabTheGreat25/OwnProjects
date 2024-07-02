@@ -1,3 +1,10 @@
+import { ClientSession } from "mongoose";
+
+declare module "express-serve-static-core" {
+  interface Request {
+    session?: ClientSession;
+  }
+}
 export interface MetaData {
   [key: string]: any;
 }

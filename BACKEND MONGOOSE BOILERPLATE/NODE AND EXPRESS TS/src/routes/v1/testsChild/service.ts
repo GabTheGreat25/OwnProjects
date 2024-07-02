@@ -32,27 +32,28 @@ async function getImageById(_id: string) {
   return await model.findOne({ _id, deleted: false }).select("image");
 }
 
-async function add(body: TestChildModel) {
-  return await model.create(body);
+async function add(body: TestChildModel, session: any) {
+  return await model.create([body], { session });
 }
 
-async function update(_id: string, body: TestChildModel) {
+async function update(_id: string, body: TestChildModel, session: any) {
   return await model.findByIdAndUpdate(_id, body, {
     new: true,
     runValidators: true,
+    session,
   });
 }
 
-async function deleteById(_id: string) {
-  return await model.findByIdAndUpdate(_id, { deleted: true });
+async function deleteById(_id: string, session: any) {
+  return await model.findByIdAndUpdate(_id, { deleted: true }, { session });
 }
 
-async function restoreById(_id: string) {
-  return await model.findByIdAndUpdate(_id, { deleted: false });
+async function restoreById(_id: string, session: any) {
+  return await model.findByIdAndUpdate(_id, { deleted: false }, { session });
 }
 
-async function forceDelete(_id: string) {
-  return await model.findByIdAndDelete(_id);
+async function forceDelete(_id: string, session: any) {
+  return await model.findByIdAndDelete(_id, { session });
 }
 
 export default {

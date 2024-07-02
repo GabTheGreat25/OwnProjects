@@ -72,6 +72,7 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
 const createNewUser = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
+    const session = req.session;
     const uploadedImages = await multipleImages(
       req.files as Express.Multer.File[],
       [],
@@ -81,11 +82,14 @@ const createNewUser = [
     if (uploadedImages.length === STATUSCODE.ZERO)
       throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
-    const data = await service.add({
-      ...req.body,
-      password: hashed,
-      image: uploadedImages,
-    });
+    const data = await service.add(
+      {
+        ...req.body,
+        password: hashed,
+        image: uploadedImages,
+      },
+      session,
+    );
 
     responseHandler(res, [data], "User created successfully");
   }),
@@ -94,6 +98,7 @@ const createNewUser = [
 const updateUser = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
+    const session = req.session;
     const oldData = await service.getById(req.params.id);
 
     const uploadNewImages = await multipleImages(
@@ -101,17 +106,22 @@ const updateUser = [
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await service.update(req.params.id, {
-      ...req.body,
-      image: uploadNewImages,
-    });
+    const data = await service.update(
+      req.params.id,
+      {
+        ...req.body,
+        image: uploadNewImages,
+      },
+      session,
+    );
 
     responseHandler(res, [data], "User updated successfully");
   }),
 ];
 
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const data = await service.deleteById(req.params.id);
+  const session = req.session;
+  const data = await service.deleteById(req.params.id, session);
 
   responseHandler(
     res,
@@ -121,7 +131,8 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const restoreUser = asyncHandler(async (req: Request, res: Response) => {
-  const data = await service.restoreById(req.params.id);
+  const session = req.session;
+  const data = await service.restoreById(req.params.id, session);
 
   responseHandler(
     res,
@@ -131,7 +142,8 @@ const restoreUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const forceDeleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const data = await service.forceDelete(req.params.id);
+  const session = req.session;
+  const data = await service.forceDelete(req.params.id, session);
 
   const message = !data ? "No User found" : "User force deleted successfully";
 

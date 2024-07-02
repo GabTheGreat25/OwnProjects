@@ -8,6 +8,7 @@ export const RESOURCE = {
   VALIDATION_ERROR: "ValidationError",
   NOT_FOUND: "Not Found",
   IMAGES: "projectImages",
+  FINISH: "finish",
   ID: "_id",
   ROLE: "role",
   PASSWORD: "+password",
