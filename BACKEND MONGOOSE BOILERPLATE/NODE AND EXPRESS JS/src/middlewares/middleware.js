@@ -4,6 +4,7 @@ import logger from "morgan";
 import compression from "compression";
 import { corsOptions } from "../config/index.js";
 import { RESOURCE } from "../constants/index.js";
+import { transaction } from "./transaction.js";
 
 export const middlewares = [
   bodyParser.json(),
@@ -11,6 +12,7 @@ export const middlewares = [
   cors(corsOptions),
   logger(RESOURCE.DEV),
   compression(),
+  transaction,
 ];
 
 export const addMiddlewares = (app) => {

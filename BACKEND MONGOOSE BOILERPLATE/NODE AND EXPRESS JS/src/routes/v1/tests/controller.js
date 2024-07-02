@@ -45,15 +45,19 @@ const getSingleTest = asyncHandler(async (req, res) => {
 const createNewTest = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
+    const session = req.session;
     const uploadedImages = await multipleImages(req.files, []);
 
     if (uploadedImages.length === STATUSCODE.ZERO)
       throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
-    const data = await service.add({
-      ...req.body,
-      image: uploadedImages,
-    });
+    const data = await service.add(
+      {
+        ...req.body,
+        image: uploadedImages,
+      },
+      session,
+    );
 
     responseHandler(res, [data], "Test created successfully");
   }),
@@ -62,24 +66,30 @@ const createNewTest = [
 const updateTest = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
-    const oldData = await service.getById(req.params.id);
+    const session = req.session;
+    const oldData = await service.getById(req.params.id, session);
 
     const uploadNewImages = await multipleImages(
       req.files,
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await service.update(req.params.id, {
-      ...req.body,
-      image: uploadNewImages,
-    });
+    const data = await service.update(
+      req.params.id,
+      {
+        ...req.body,
+        image: uploadNewImages,
+      },
+      session,
+    );
 
     responseHandler(res, [data], "Test updated successfully");
   }),
 ];
 
 const deleteTest = asyncHandler(async (req, res) => {
-  const data = await service.deleteById(req.params.id);
+  const session = req.session;
+  const data = await service.deleteById(req.params.id, session);
 
   responseHandler(
     res,
@@ -89,7 +99,8 @@ const deleteTest = asyncHandler(async (req, res) => {
 });
 
 const restoreTest = asyncHandler(async (req, res) => {
-  const data = await service.restoreById(req.params.id);
+  const session = req.session;
+  const data = await service.restoreById(req.params.id, session);
 
   responseHandler(
     res,
@@ -99,7 +110,8 @@ const restoreTest = asyncHandler(async (req, res) => {
 });
 
 const forceDeleteTest = asyncHandler(async (req, res) => {
-  const data = await service.forceDelete(req.params.id);
+  const session = req.session;
+  const data = await service.forceDelete(req.params.id, session);
 
   const message = !data ? "No Test found" : "Test force deleted successfully";
 

@@ -24,7 +24,7 @@ async function getEmail(email) {
     .select(RESOURCE.PASSWORD);
 }
 
-async function add(body) {
+async function add(body, session) {
   return await (
     body.roles === ROLE.ADMIN
       ? AdminDiscriminator
@@ -33,26 +33,27 @@ async function add(body) {
         : body.roles === ROLE.CUSTOMER
           ? CustomerDiscriminator
           : model
-  ).create([body]);
+  ).create([body], { session });
 }
 
-async function update(_id, body) {
+async function update(_id, body, session) {
   return await model.findByIdAndUpdate(_id, body, {
     new: true,
     runValidators: true,
+    session,
   });
 }
 
-async function deleteById(_id) {
-  return await model.findByIdAndUpdate(_id, { deleted: true });
+async function deleteById(_id, session) {
+  return await model.findByIdAndUpdate(_id, { deleted: true }, { session });
 }
 
-async function restoreById(_id) {
-  return await model.findByIdAndUpdate(_id, { deleted: false });
+async function restoreById(_id, session) {
+  return await model.findByIdAndUpdate(_id, { deleted: false }, { session });
 }
 
-async function forceDelete(_id) {
-  return await model.findByIdAndDelete(_id);
+async function forceDelete(_id, session) {
+  return await model.findByIdAndDelete(_id, { session });
 }
 
 export default {
