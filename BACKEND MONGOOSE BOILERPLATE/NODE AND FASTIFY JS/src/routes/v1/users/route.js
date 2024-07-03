@@ -37,7 +37,6 @@ const routes = [
   {
     method: METHOD.POST,
     handler: userController.createNewUser,
-    middleware: [verifyJWT],
     preHandler: upload.array("image"),
   },
   {
