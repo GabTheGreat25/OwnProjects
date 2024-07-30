@@ -8,7 +8,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: (req, file) => {
     return {
-      folder: RESOURCE.IMAGES,
+      folder: RESOURCE.CLOUDINARY_FOLDER,
       public_id: `${file.originalname.replace(/\.[^/.]+$/, "")}-${uuidv4()}`,
     };
   },

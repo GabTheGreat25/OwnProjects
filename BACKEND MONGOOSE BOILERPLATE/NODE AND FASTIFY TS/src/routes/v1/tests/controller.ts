@@ -5,6 +5,9 @@ import service from "./service";
 import { STATUSCODE } from "../../../constants";
 import { responseHandler, multipleImages } from "../../../utils";
 import { TestModel } from "../../../types";
+import { ClientSession } from "mongoose";
+
+let session: ClientSession | null = null;
 
 const getAllTests = async (req: FastifyRequest, reply: FastifyReply) => {
   const data = await service.getAll();
@@ -58,10 +61,13 @@ const createNewTest = async (
   if (uploadedImages.length === STATUSCODE.ZERO)
     throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
-  const data = await service.add({
-    ...req.body,
-    image: uploadedImages,
-  });
+  const data = await service.add(
+    {
+      ...req.body,
+      image: uploadedImages,
+    },
+    session,
+  );
 
   responseHandler(req, reply, [data], "Test created successfully");
 };
@@ -77,10 +83,14 @@ const updateTest = async (
     oldData?.image.map((image) => image.public_id) || [],
   );
 
-  const data = await service.update(req.params.id, {
-    ...req.body,
-    image: uploadNewImages,
-  });
+  const data = await service.update(
+    req.params.id,
+    {
+      ...req.body,
+      image: uploadNewImages,
+    },
+    session,
+  );
 
   responseHandler(req, reply, [data], "Test updated successfully");
 };
@@ -89,7 +99,7 @@ const deleteTest = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.deleteById(req.params.id);
+  const data = await service.deleteById(req.params.id, session);
 
   responseHandler(
     req,
@@ -103,7 +113,7 @@ const restoreTest = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.restoreById(req.params.id);
+  const data = await service.restoreById(req.params.id, session);
 
   responseHandler(
     req,
@@ -117,7 +127,7 @@ const forceDeleteTest = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.forceDelete(req.params.id);
+  const data = await service.forceDelete(req.params.id, session);
 
   const message = !data ? "No Test found" : "Test force deleted successfully";
 

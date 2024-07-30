@@ -45,7 +45,6 @@ const getSingleTestChild = asyncHandler(async (req, res) => {
 const createNewTestChild = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
-    const session = req.session;
     const uploadedImages = await multipleImages(req.files, []);
 
     if (uploadedImages.length === STATUSCODE.ZERO)
@@ -56,7 +55,7 @@ const createNewTestChild = [
         ...req.body,
         image: uploadedImages,
       },
-      session,
+      req.session,
     );
 
     responseHandler(res, [data], "TestChild created successfully");
@@ -66,7 +65,6 @@ const createNewTestChild = [
 const updateTestChild = [
   upload.array("image"),
   asyncHandler(async (req, res) => {
-    const session = req.session;
     const oldData = await service.getImageById(req.params.id);
 
     const uploadNewImages = await multipleImages(
@@ -80,7 +78,7 @@ const updateTestChild = [
         ...req.body,
         image: uploadNewImages,
       },
-      session,
+      req.session,
     );
 
     responseHandler(res, [data], "TestChild updated successfully");
@@ -88,8 +86,7 @@ const updateTestChild = [
 ];
 
 const deleteTestChild = asyncHandler(async (req, res) => {
-  const session = req.session;
-  const data = await service.deleteById(req.params.id, session);
+  const data = await service.deleteById(req.params.id, req.session);
 
   responseHandler(
     res,
@@ -101,12 +98,11 @@ const deleteTestChild = asyncHandler(async (req, res) => {
 });
 
 const restoreTestChild = asyncHandler(async (req, res) => {
-  const session = req.session;
-  const data = await service.restoreById(req.params.id, session);
+  const data = await service.restoreById(req.params.id, req.session);
 
   responseHandler(
     res,
-    !data?.deleted ? [] : data,
+    !data?.deleted ? [] : [data],
     !data?.deleted
       ? "TestChild is not deleted"
       : "TestChild restored successfully",
@@ -114,8 +110,7 @@ const restoreTestChild = asyncHandler(async (req, res) => {
 });
 
 const forceDeleteTestChild = asyncHandler(async (req, res) => {
-  const session = req.session;
-  const data = await service.forceDelete(req.params.id, session);
+  const data = await service.forceDelete(req.params.id, req.session);
 
   const message = !data
     ? "No TestChild found"
@@ -126,7 +121,7 @@ const forceDeleteTestChild = asyncHandler(async (req, res) => {
     data?.image ? data.image.map((image) => image.public_id) : [],
   );
 
-  responseHandler(res, data, message);
+  responseHandler(res, [data], message);
 });
 
 export {

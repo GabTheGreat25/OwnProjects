@@ -34,11 +34,11 @@ async function deleteById(_id, session) {
 }
 
 async function restoreById(_id, session) {
-  return Promise.all([
-    testChildModel
-      .updateMany({ test: _id }, { deleted: true })
-      .session(session),
-  ]).then(() => model.findByIdAndUpdate(_id, { deleted: false }, { session }));
+    return Promise.all([
+      testChildModel
+        .updateMany({ test: _id }, { deleted: true })
+        .session(session),
+    ]).then(() => model.findByIdAndUpdate(_id, { deleted: false }, { session }));
 }
 
 async function forceDelete(_id, session) {

@@ -1,3 +1,10 @@
+import { FastifyRequest } from "fastify";
+import { ClientSession } from "mongoose";
+
+export interface CustomFastifyRequest extends FastifyRequest {
+  session?: ClientSession;
+}
+
 export interface MetaData {
   [key: string]: any;
 }

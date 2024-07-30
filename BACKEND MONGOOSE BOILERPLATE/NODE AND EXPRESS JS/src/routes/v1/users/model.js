@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose from "mongoose";
 import { RESOURCE } from "../../../constants/index.js";
 
 const schemaOptions = {
@@ -6,7 +6,7 @@ const schemaOptions = {
   timestamps: true,
 };
 
-const schema = new Schema(
+const schema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -30,6 +30,16 @@ const schema = new Schema(
         originalname: String,
       },
     ],
+    verificationCode: {
+      code: {
+        type: String,
+        default: null,
+      },
+      createdAt: {
+        type: Date,
+        default: null,
+      },
+    },
     deleted: {
       type: Boolean,
       default: false,
@@ -38,4 +48,5 @@ const schema = new Schema(
   schemaOptions,
 );
 
-export default model(RESOURCE.USERS, schema);
+export default mongoose.models[RESOURCE.USERS] ||
+  mongoose.model(RESOURCE.USERS, schema);
