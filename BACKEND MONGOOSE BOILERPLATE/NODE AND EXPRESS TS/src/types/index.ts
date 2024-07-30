@@ -5,6 +5,7 @@ declare module "express-serve-static-core" {
     session?: ClientSession;
   }
 }
+
 export interface MetaData {
   [key: string]: any;
 }
@@ -36,6 +37,10 @@ export interface UserModel {
   email: string;
   password: string;
   image: UploadImages[];
+  verificationCode: {
+    code: string;
+    createdAt: Date;
+  };
   deleted?: boolean;
 }
 

@@ -8,6 +8,8 @@ import {
   upload,
   responseHandler,
   multipleImages,
+  sendEmail,
+  generateRandomCode,
 } from "../../../utils/index.js";
 import {
   setToken,
@@ -15,7 +17,6 @@ import {
   blacklistToken,
   generateAccess,
 } from "../../../middlewares/index.js";
-import { sendEmail, generateRandomCode } from "../../../utils/index.js";
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const data = await service.getAll();
@@ -174,7 +175,7 @@ const sendUserEmailOTP = asyncHandler(async (req, res) => {
   const email = await service.getEmail(req.body.email);
 
   if (new Date() - new Date(email.verificationCode.createdAt) < 5 * 60 * 1000) {
-    throw new createError(
+    throw createError(
       "Please wait 5 minutes before requesting a new verification code",
     );
   }

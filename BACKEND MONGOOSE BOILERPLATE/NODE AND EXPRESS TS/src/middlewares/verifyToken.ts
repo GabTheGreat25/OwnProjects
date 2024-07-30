@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
-import { getToken, isTokenBlacklisted } from "../middlewares";
-import { ENV } from "../config";
+import {
+  getToken,
+  isTokenBlacklisted,
+  extractToken,
+  verifyToken,
+} from "../middlewares";
 import { STATUSCODE } from "../constants";
 
 export function verifyJWT(
@@ -10,7 +14,7 @@ export function verifyJWT(
   res: Response,
   next: NextFunction,
 ): void {
-  const token = req.headers.authorization?.split(" ")[STATUSCODE.ONE];
+  const token = extractToken(req.headers.authorization || "");
 
   !token
     ? next(createError(STATUSCODE.UNAUTHORIZED, "Access denied"))
@@ -19,7 +23,7 @@ export function verifyJWT(
       : isTokenBlacklisted()
         ? next(createError(STATUSCODE.UNAUTHORIZED, "Token is Expired"))
         : (() => {
-            req.user = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
+            req.user = verifyToken(token);
             next();
           })();
 }

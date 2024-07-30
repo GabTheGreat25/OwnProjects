@@ -5,7 +5,13 @@ import bcrypt from "bcrypt";
 import service from "./service";
 import { ENV } from "../../../config";
 import { RESOURCE, STATUSCODE } from "../../../constants";
-import { upload, responseHandler, multipleImages } from "../../../utils";
+import {
+  upload,
+  responseHandler,
+  multipleImages,
+  sendEmail,
+  generateRandomCode,
+} from "../../../utils";
 import {
   setToken,
   getToken,
@@ -55,7 +61,10 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   if (!(await bcrypt.compare(req.body.password, data.password)))
     throw createError(STATUSCODE.UNAUTHORIZED, "Password does not match");
 
-  const accessToken = generateAccess({ role: (data as any)[RESOURCE.ROLE] });
+  const accessToken = generateAccess({
+    id: data._id,
+    role: (data as any)[RESOURCE.ROLE],
+  });
   setToken(accessToken.access);
 
   responseHandler(res, data, "User Login successfully", accessToken);
@@ -72,7 +81,6 @@ const logoutUser = asyncHandler(async (req: Request, res: Response) => {
 const createNewUser = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const session = req.session;
     const uploadedImages = await multipleImages(
       req.files as Express.Multer.File[],
       [],
@@ -88,7 +96,7 @@ const createNewUser = [
         password: hashed,
         image: uploadedImages,
       },
-      session,
+      req.session,
     );
 
     responseHandler(res, [data], "User created successfully");
@@ -98,12 +106,11 @@ const createNewUser = [
 const updateUser = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const session = req.session;
     const oldData = await service.getById(req.params.id);
 
     const uploadNewImages = await multipleImages(
       req.files as Express.Multer.File[],
-      oldData?.image.map((image) => image.public_id) || [],
+      oldData?.image.map((image: any) => image.public_id) || [],
     );
 
     const data = await service.update(
@@ -112,7 +119,7 @@ const updateUser = [
         ...req.body,
         image: uploadNewImages,
       },
-      session,
+      req.session,
     );
 
     responseHandler(res, [data], "User updated successfully");
@@ -120,8 +127,7 @@ const updateUser = [
 ];
 
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const session = req.session;
-  const data = await service.deleteById(req.params.id, session);
+  const data = await service.deleteById(req.params.id, req.session);
 
   responseHandler(
     res,
@@ -131,28 +137,98 @@ const deleteUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const restoreUser = asyncHandler(async (req: Request, res: Response) => {
-  const session = req.session;
-  const data = await service.restoreById(req.params.id, session);
+  const data = await service.restoreById(req.params.id, req.session);
 
   responseHandler(
     res,
-    !data?.deleted ? [] : data,
+    !data?.deleted ? [] : [data],
     !data?.deleted ? "User is not deleted" : "User restored successfully",
   );
 });
 
 const forceDeleteUser = asyncHandler(async (req: Request, res: Response) => {
-  const session = req.session;
-  const data = await service.forceDelete(req.params.id, session);
+  const data = await service.forceDelete(req.params.id, req.session);
 
   const message = !data ? "No User found" : "User force deleted successfully";
 
   await multipleImages(
     [],
-    data?.image ? data.image.map((image) => image.public_id) : [],
+    data?.image ? data.image.map((image: any) => image.public_id) : [],
   );
 
-  responseHandler(res, data, message);
+  responseHandler(res, [data], message);
+});
+
+const changeUserPassword = asyncHandler(async (req, res) => {
+  if (!req.body.newPassword || !req.body.confirmPassword)
+    throw createError(STATUSCODE.BAD_REQUEST, "Both passwords are required");
+
+  if (req.body.newPassword !== req.body.confirmPassword)
+    throw createError(STATUSCODE.BAD_REQUEST, "Passwords do not match");
+
+  const data = await service.changePassword(
+    req.params.id,
+    req.body.newPassword,
+    req.session,
+  );
+
+  responseHandler(res, [data], "Password changed successfully");
+});
+
+const sendUserEmailOTP = asyncHandler(async (req, res) => {
+  const email = await service.getEmail(req.body.email);
+
+  if (
+    new Date().getTime() -
+      new Date(email.verificationCode.createdAt).getTime() <
+    5 * 60 * 1000
+  ) {
+    throw createError(
+      400,
+      "Please wait 5 minutes before requesting a new verification code.",
+    );
+  }
+
+  const code = generateRandomCode();
+  await sendEmail(req.body.email, code);
+
+  const data = await service.sendEmailOTP(req.body.email, code, req.session);
+
+  responseHandler(res, [data], "Email OTP sent successfully");
+});
+
+const resetUserEmailPassword = asyncHandler(async (req, res) => {
+  if (
+    !req.body.newPassword ||
+    !req.body.confirmPassword ||
+    req.body.newPassword !== req.body.confirmPassword
+  )
+    throw createError(
+      STATUSCODE.BAD_REQUEST,
+      "Passwords are required and must match",
+    );
+
+  const code = await service.getCode(req.body.verificationCode);
+
+  if (
+    Date.now() - new Date(code.verificationCode.createdAt).getTime() >
+    5 * 60 * 1000
+  ) {
+    code.verificationCode = null;
+    await code.save();
+    throw createError("Verification code has expired");
+  }
+
+  const data = await service.resetPassword(
+    req.body.verificationCode,
+    req.body.newPassword,
+    req.session,
+  );
+
+  if (!data)
+    throw createError(STATUSCODE.BAD_REQUEST, "Invalid verification code");
+
+  responseHandler(res, [data], "Password Successfully Reset");
 });
 
 export {
@@ -166,4 +242,7 @@ export {
   forceDeleteUser,
   loginUser,
   logoutUser,
+  changeUserPassword,
+  sendUserEmailOTP,
+  resetUserEmailPassword,
 };

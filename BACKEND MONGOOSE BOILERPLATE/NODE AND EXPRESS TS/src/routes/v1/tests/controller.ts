@@ -4,7 +4,6 @@ import createError from "http-errors";
 import service from "./service";
 import { STATUSCODE } from "../../../constants";
 import { upload, responseHandler, multipleImages } from "../../../utils";
-import { Session } from "inspector";
 
 const getAllTests = asyncHandler(async (req: Request, res: Response) => {
   const data = await service.getAll();
@@ -43,7 +42,6 @@ const getSingleTest = asyncHandler(async (req: Request, res: Response) => {
 const createNewTest = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const session = req.session;
     const uploadedImages = await multipleImages(
       req.files as Express.Multer.File[],
       [],
@@ -57,7 +55,7 @@ const createNewTest = [
         ...req.body,
         image: uploadedImages,
       },
-      session,
+      req.session,
     );
 
     responseHandler(res, [data], "Test created successfully");
@@ -67,12 +65,11 @@ const createNewTest = [
 const updateTest = [
   upload.array("image"),
   asyncHandler(async (req: Request, res: Response) => {
-    const session = req.session;
     const oldData = await service.getById(req.params.id);
 
     const uploadNewImages = await multipleImages(
       req.files as Express.Multer.File[],
-      oldData?.image.map((image) => image.public_id) || [],
+      oldData?.image.map((image: any) => image.public_id) || [],
     );
 
     const data = await service.update(
@@ -81,7 +78,7 @@ const updateTest = [
         ...req.body,
         image: uploadNewImages,
       },
-      session,
+      req.session,
     );
 
     responseHandler(res, [data], "Test updated successfully");
@@ -89,8 +86,7 @@ const updateTest = [
 ];
 
 const deleteTest = asyncHandler(async (req: Request, res: Response) => {
-  const session = req.session;
-  const data = await service.deleteById(req.params.id, session);
+  const data = await service.deleteById(req.params.id, req.session);
 
   responseHandler(
     res,
@@ -100,28 +96,26 @@ const deleteTest = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const restoreTest = asyncHandler(async (req: Request, res: Response) => {
-  const session = req.session;
-  const data = await service.restoreById(req.params.id, session);
+  const data = await service.restoreById(req.params.id, req.session);
 
   responseHandler(
     res,
-    !data?.deleted ? [] : data,
+    !data?.deleted ? [] : [data],
     !data?.deleted ? "Test is not deleted" : "Test restored successfully",
   );
 });
 
 const forceDeleteTest = asyncHandler(async (req: Request, res: Response) => {
-  const session = req.session;
-  const data = await service.forceDelete(req.params.id, session);
+  const data = await service.forceDelete(req.params.id, req.session);
 
   const message = !data ? "No Test found" : "Test force deleted successfully";
 
   await multipleImages(
     [],
-    data?.image ? data.image.map((image) => image.public_id) : [],
+    data?.image ? data.image.map((image: any) => image.public_id) : [],
   );
 
-  responseHandler(res, data, message);
+  responseHandler(res, [data], message);
 });
 
 export {

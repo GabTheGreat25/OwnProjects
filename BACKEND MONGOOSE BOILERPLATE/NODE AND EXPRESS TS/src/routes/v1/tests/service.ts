@@ -1,7 +1,6 @@
 import model from "./model";
 import testChildModel from "../testsChild/model";
 import { TestModel } from "../../../types";
-import { ClientSession } from "mongoose";
 
 async function getAll() {
   return await model.find({ deleted: false });
@@ -23,6 +22,7 @@ async function update(_id: string, body: TestModel, session: any) {
   return await model.findByIdAndUpdate(_id, body, {
     new: true,
     runValidators: true,
+    deleted: false,
     session,
   });
 }

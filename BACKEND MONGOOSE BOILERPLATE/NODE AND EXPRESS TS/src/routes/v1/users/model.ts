@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose from "mongoose";
 import { RESOURCE } from "../../../constants";
 import { UserModel } from "../../../types";
 
@@ -7,7 +7,7 @@ const schemaOptions = {
   timestamps: true,
 };
 
-const schema = new Schema<UserModel>(
+const schema = new mongoose.Schema<UserModel>(
   {
     name: {
       type: String,
@@ -31,6 +31,16 @@ const schema = new Schema<UserModel>(
         originalname: String,
       },
     ],
+    verificationCode: {
+      code: {
+        type: String,
+        default: null,
+      },
+      createdAt: {
+        type: Date,
+        default: null,
+      },
+    },
     deleted: {
       type: Boolean,
       default: false,
@@ -39,4 +49,5 @@ const schema = new Schema<UserModel>(
   schemaOptions,
 );
 
-export default model(RESOURCE.USERS, schema);
+export default mongoose.models[RESOURCE.USERS] ||
+  mongoose.model(RESOURCE.USERS, schema);

@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose from "mongoose";
 import badWords from "bad-words";
 import { RESOURCE } from "../../../constants";
 import { TestChildModel } from "../../../types";
@@ -11,10 +11,10 @@ const schemaOptions = {
   timestamps: true,
 };
 
-const schema = new Schema<TestChildModel>(
+const schema = new mongoose.Schema<TestChildModel>(
   {
     test: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: RESOURCE.TEST,
     },
@@ -43,4 +43,5 @@ const schema = new Schema<TestChildModel>(
   schemaOptions,
 );
 
-export default model(RESOURCE.TESTS_CHILD, schema);
+export default mongoose.models[RESOURCE.TESTS_CHILD] ||
+  mongoose.model(RESOURCE.TESTS_CHILD, schema);

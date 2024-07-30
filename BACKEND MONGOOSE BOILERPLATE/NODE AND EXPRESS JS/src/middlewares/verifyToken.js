@@ -1,7 +1,11 @@
 import createError from "http-errors";
-import { getToken, isTokenBlacklisted } from "../middlewares/index.js";
+import {
+  getToken,
+  isTokenBlacklisted,
+  extractToken,
+  verifyToken,
+} from "../middlewares/index.js";
 import { STATUSCODE } from "../constants/index.js";
-import { extractToken, verifyToken } from "../middlewares/index.js";
 
 export function verifyJWT(req, res, next) {
   const token = extractToken(req.headers.authorization);

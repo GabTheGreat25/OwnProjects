@@ -11,6 +11,8 @@ import {
   EmployeeModel,
   CustomerModel,
 } from "../../../types";
+import { ENV } from "../../../config";
+import bcrypt from "bcrypt";
 
 async function getAll() {
   return await model.find({ deleted: false });
@@ -45,8 +47,10 @@ async function add(body: UserModel, session: any) {
 
 async function update(_id: string, body: UserModel, session: any) {
   return await model.findByIdAndUpdate(_id, body, {
+    overwriteDiscriminatorKey: true,
     new: true,
     runValidators: true,
+    deleted: false,
     session,
   });
 }
@@ -63,6 +67,52 @@ async function forceDelete(_id: string, session: any) {
   return await model.findByIdAndDelete(_id, { session });
 }
 
+async function changePassword(_id: string, newPassword: string, session: any) {
+  return await model.findByIdAndUpdate(
+    _id,
+    { password: await bcrypt.hash(newPassword, ENV.SALT_NUMBER) },
+    {
+      new: true,
+      runValidators: true,
+      select: RESOURCE.PASSWORD,
+      deleted: false,
+      session,
+    },
+  );
+}
+
+async function getCode(verificationCode: string) {
+  return await model.findOne({
+    "verificationCode.code": verificationCode,
+    deleted: false,
+  });
+}
+
+async function sendEmailOTP(email: string, otp: string, session: any) {
+  return await model.findByIdAndUpdate(
+    (await model.findOne({ email }))?._id,
+    { verificationCode: { code: otp, createdAt: new Date().toISOString() } },
+    { new: true, runValidators: true, deleted: false, session },
+  );
+}
+
+async function resetPassword(
+  verificationCode: string,
+  newPassword: string,
+  session: any,
+) {
+  return await model
+    .findByIdAndUpdate(
+      (await model.findOne({ "verificationCode.code": verificationCode }))?._id,
+      {
+        verificationCode: null,
+        password: await bcrypt.hash(newPassword, ENV.SALT_NUMBER),
+      },
+      { new: true, runValidators: true, deleted: false, session },
+    )
+    .select(RESOURCE.PASSWORD);
+}
+
 export default {
   getAll,
   getAllDeleted,
@@ -73,4 +123,8 @@ export default {
   deleteById,
   restoreById,
   forceDelete,
+  changePassword,
+  getCode,
+  sendEmailOTP,
+  resetPassword,
 };

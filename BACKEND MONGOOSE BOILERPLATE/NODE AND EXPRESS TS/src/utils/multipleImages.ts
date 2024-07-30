@@ -7,9 +7,8 @@ export async function multipleImages(
 ): Promise<UploadImages[]> {
   if (!files || !Array.isArray(files)) return [];
 
-  for (const publicId of oldImagePublicIds) {
+  for (const publicId of oldImagePublicIds)
     if (publicId) await cloudinary.uploader.destroy(publicId);
-  }
 
   const uploadPromises = files.map((file) =>
     cloudinary.uploader
