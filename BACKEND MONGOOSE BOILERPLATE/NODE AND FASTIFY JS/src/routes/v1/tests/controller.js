@@ -41,7 +41,6 @@ const getSingleTest = async (req, reply) => {
 };
 
 const createNewTest = async (req, reply) => {
-  const session = req.session;
   const uploadedImages = await multipleImages(req.files, []);
 
   if (uploadedImages.length === STATUSCODE.ZERO)
@@ -52,14 +51,13 @@ const createNewTest = async (req, reply) => {
       ...req.body,
       image: uploadedImages,
     },
-    session,
+    req.session,
   );
 
   responseHandler(req, reply, [data], "Test created successfully");
 };
 
 const updateTest = async (req, reply) => {
-  const session = req.session;
   const oldData = await service.getById(req.params.id);
 
   const uploadNewImages = await multipleImages(
@@ -73,15 +71,14 @@ const updateTest = async (req, reply) => {
       ...req.body,
       image: uploadNewImages,
     },
-    session,
+    req.session,
   );
 
   responseHandler(req, reply, [data], "Test updated successfully");
 };
 
 const deleteTest = async (req, reply) => {
-  const session = req.session;
-  const data = await service.deleteById(req.params.id, session);
+  const data = await service.deleteById(req.params.id, req.session);
 
   responseHandler(
     req,
@@ -92,20 +89,18 @@ const deleteTest = async (req, reply) => {
 };
 
 const restoreTest = async (req, reply) => {
-  const session = req.session;
-  const data = await service.restoreById(req.params.id, session);
+  const data = await service.restoreById(req.params.id, req.session);
 
   responseHandler(
     req,
     reply,
-    !data?.deleted ? [] : data,
+    !data?.deleted ? [] : [data],
     !data?.deleted ? "Test is not deleted" : "Test restored successfully",
   );
 };
 
 const forceDeleteTest = async (req, reply) => {
-  const session = req.session;
-  const data = await service.forceDelete(req.params.id, session);
+  const data = await service.forceDelete(req.params.id, req.session);
 
   const message = !data ? "No Test found" : "Test force deleted successfully";
 
@@ -114,7 +109,7 @@ const forceDeleteTest = async (req, reply) => {
     data?.image ? data.image.map((image) => image.public_id) : [],
   );
 
-  responseHandler(req, reply, data, message);
+  responseHandler(req, reply, [data], message);
 };
 
 export {

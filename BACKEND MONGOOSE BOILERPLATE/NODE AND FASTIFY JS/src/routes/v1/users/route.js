@@ -68,6 +68,23 @@ const routes = [
     middleware: [verifyJWT],
     handler: userController.forceDeleteUser,
   },
+  {
+    method: METHOD.PATCH,
+    path: PATH.CHANGE_PASSWORD,
+    roles: [ROLE.ADMIN, ROLE.EMPLOYEE, ROLE.CUSTOMER],
+    middleware: [verifyJWT],
+    handler: userController.changeUserPassword,
+  },
+  {
+    method: METHOD.POST,
+    path: PATH.EMAIL_OTP,
+    handler: userController.sendUserEmailOTP,
+  },
+  {
+    method: METHOD.PATCH,
+    path: PATH.RESTORE_PASSWORD,
+    handler: userController.resetUserEmailPassword,
+  },
 ];
 
 const router = (app, opts, done) => {

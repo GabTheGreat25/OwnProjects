@@ -3,9 +3,8 @@ import { v2 as cloudinary } from "cloudinary";
 export async function multipleImages(files, oldImagePublicIds) {
   if (!files || !Array.isArray(files)) return [];
 
-  for (const publicId of oldImagePublicIds) {
+  for (const publicId of oldImagePublicIds)
     if (publicId) await cloudinary.uploader.destroy(publicId);
-  }
 
   const uploadPromises = files.map((file) =>
     cloudinary.uploader
