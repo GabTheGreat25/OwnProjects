@@ -9,4 +9,6 @@ const schemaOptions = {
 
 const adminSchema = new Schema<AdminModel>({}, schemaOptions);
 
-export const AdminDiscriminator = users.discriminator(ROLE.ADMIN, adminSchema);
+export const AdminDiscriminator =
+  users?.discriminators?.[ROLE.ADMIN] ||
+  users.discriminator(ROLE.ADMIN, adminSchema);

@@ -18,4 +18,6 @@ export const ENV = {
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || "your_cloud_name",
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "your_api_key",
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "your_api_secret",
+  EMAIL: process.env.EMAIL || "your_email",
+  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD || "your_email_password",
 };

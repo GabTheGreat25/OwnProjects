@@ -80,7 +80,7 @@ const updateTest = async (
 
   const uploadNewImages = await multipleImages(
     req.files as unknown as MultipartFile[],
-    oldData?.image.map((image) => image.public_id) || [],
+    oldData?.image.map((image: any) => image.public_id) || [],
   );
 
   const data = await service.update(
@@ -118,7 +118,7 @@ const restoreTest = async (
   responseHandler(
     req,
     reply,
-    !data?.deleted ? [] : data,
+    !data?.deleted ? [] : [data],
     !data?.deleted ? "Test is not deleted" : "Test restored successfully",
   );
 };
@@ -133,10 +133,10 @@ const forceDeleteTest = async (
 
   await multipleImages(
     [],
-    data?.image ? data.image.map((image) => image.public_id) : [],
+    data?.image ? data.image.map((image: any) => image.public_id) : [],
   );
 
-  responseHandler(req, reply, data, message);
+  responseHandler(req, reply, [data], message);
 };
 
 export {

@@ -40,10 +40,15 @@ export interface TestChildModel {
 }
 
 export interface UserModel {
+  _id?: string;
   name: string;
   email: string;
   password: string;
   image: UploadImages[];
+  verificationCode: {
+    code: string;
+    createdAt: Date;
+  };
   deleted?: boolean;
 }
 
@@ -58,4 +63,15 @@ export interface EmployeeModel extends UserModel {
 export interface CustomerModel extends UserModel {
   roles?: string;
   description: string;
+}
+
+export interface ChangePassword {
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ForgotChangePassword {
+  newPassword: string;
+  confirmPassword: string;
+  verificationCode: string;
 }

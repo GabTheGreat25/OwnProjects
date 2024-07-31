@@ -159,7 +159,7 @@ const forceDeleteUser = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(res, [data], message);
 });
 
-const changeUserPassword = asyncHandler(async (req, res) => {
+const changeUserPassword = asyncHandler(async (req: Request, res: Response) => {
   if (!req.body.newPassword || !req.body.confirmPassword)
     throw createError(STATUSCODE.BAD_REQUEST, "Both passwords are required");
 
@@ -175,7 +175,7 @@ const changeUserPassword = asyncHandler(async (req, res) => {
   responseHandler(res, [data], "Password changed successfully");
 });
 
-const sendUserEmailOTP = asyncHandler(async (req, res) => {
+const sendUserEmailOTP = asyncHandler(async (req: Request, res: Response) => {
   const email = await service.getEmail(req.body.email);
 
   if (
@@ -197,39 +197,41 @@ const sendUserEmailOTP = asyncHandler(async (req, res) => {
   responseHandler(res, [data], "Email OTP sent successfully");
 });
 
-const resetUserEmailPassword = asyncHandler(async (req, res) => {
-  if (
-    !req.body.newPassword ||
-    !req.body.confirmPassword ||
-    req.body.newPassword !== req.body.confirmPassword
-  )
-    throw createError(
-      STATUSCODE.BAD_REQUEST,
-      "Passwords are required and must match",
+const resetUserEmailPassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (
+      !req.body.newPassword ||
+      !req.body.confirmPassword ||
+      req.body.newPassword !== req.body.confirmPassword
+    )
+      throw createError(
+        STATUSCODE.BAD_REQUEST,
+        "Passwords are required and must match",
+      );
+
+    const code = await service.getCode(req.body.verificationCode);
+
+    if (
+      Date.now() - new Date(code.verificationCode.createdAt).getTime() >
+      5 * 60 * 1000
+    ) {
+      code.verificationCode = null;
+      await code.save();
+      throw createError("Verification code has expired");
+    }
+
+    const data = await service.resetPassword(
+      req.body.verificationCode,
+      req.body.newPassword,
+      req.session,
     );
 
-  const code = await service.getCode(req.body.verificationCode);
+    if (!data)
+      throw createError(STATUSCODE.BAD_REQUEST, "Invalid verification code");
 
-  if (
-    Date.now() - new Date(code.verificationCode.createdAt).getTime() >
-    5 * 60 * 1000
-  ) {
-    code.verificationCode = null;
-    await code.save();
-    throw createError("Verification code has expired");
-  }
-
-  const data = await service.resetPassword(
-    req.body.verificationCode,
-    req.body.newPassword,
-    req.session,
-  );
-
-  if (!data)
-    throw createError(STATUSCODE.BAD_REQUEST, "Invalid verification code");
-
-  responseHandler(res, [data], "Password Successfully Reset");
-});
+    responseHandler(res, [data], "Password Successfully Reset");
+  },
+);
 
 export {
   getAllUsers,

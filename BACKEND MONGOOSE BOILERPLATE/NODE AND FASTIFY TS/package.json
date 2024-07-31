@@ -1,16 +1,16 @@
 {
-  "name": "fastify-js-practice",
+  "name": "node-and-fastify-ts",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "build": "npx tsc",
+    "build": "npx tsc && npx copyfiles -u 1 src/views/**/* dist/src",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node server.ts",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\""
+    "dev": "npx tsc && npx copyfiles -u 1 src/views/**/* dist/src && nodemon dist/server.js"
   },
   "author": "GabTheGreat25",
   "license": "ISC",
-  "description": "",
+  "description": "CRUD API with Multiple Images, Authentication and Authorization using Node and Fastify ts",
   "dependencies": {
     "@fastify/cors": "^9.0.1",
     "@fastify/formbody": "^7.4.0",
@@ -22,10 +22,12 @@
     "dotenv": "^16.4.5",
     "fastify": "^4.27.0",
     "fastify-multer": "^2.0.3",
+    "handlebars": "^4.7.8",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^6.9.14",
     "typescript": "^5.4.5",
     "uuid": "^9.0.1"
   },
@@ -35,9 +37,11 @@
     "@types/http-errors": "^2.0.4",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/mongoose": "^5.11.97",
+    "@types/nodemailer": "^6.4.15",
     "@types/node": "^20.12.12",
     "@types/uuid": "^9.0.8",
     "concurrently": "^8.2.2",
+    "copyfiles": "^2.4.1",
     "nodemon": "^3.1.3",
     "prettier": "^3.3.1",
     "ts-node": "^10.9.2"

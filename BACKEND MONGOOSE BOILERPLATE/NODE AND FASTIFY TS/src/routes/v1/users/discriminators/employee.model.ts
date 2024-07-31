@@ -9,7 +9,6 @@ const schemaOptions = {
 
 const employeeSchema = new Schema<EmployeeModel>({}, schemaOptions);
 
-export const EmployeeDiscriminator = users.discriminator(
-  ROLE.EMPLOYEE,
-  employeeSchema,
-);
+export const EmployeeDiscriminator =
+  users?.discriminators?.[ROLE.EMPLOYEE] ||
+  users.discriminator(ROLE.EMPLOYEE, employeeSchema);

@@ -5,14 +5,26 @@ import bcrypt from "bcrypt";
 import service from "./service";
 import { ENV } from "../../../config";
 import { RESOURCE, STATUSCODE } from "../../../constants";
-import { responseHandler, multipleImages } from "../../../utils";
+import {
+  responseHandler,
+  multipleImages,
+  sendEmail,
+  generateRandomCode,
+} from "../../../utils";
 import {
   setToken,
   getToken,
   blacklistToken,
   generateAccess,
 } from "../../../middlewares";
-import { UserModel } from "../../../types";
+import {
+  UserModel,
+  ChangePassword,
+  ForgotChangePassword,
+} from "../../../types";
+import { ClientSession } from "mongoose";
+
+let session: ClientSession | null = null;
 
 const getAllUsers = async (req: FastifyRequest, reply: FastifyReply) => {
   const data = await service.getAll();
@@ -65,7 +77,10 @@ const loginUser = async (
   if (!(await bcrypt.compare(req.body.password, data.password)))
     throw createError(STATUSCODE.UNAUTHORIZED, "Password does not match");
 
-  const accessToken = generateAccess({ role: (data as any)[RESOURCE.ROLE] });
+  const accessToken = generateAccess({
+    id: data._id,
+    role: (data as any)[RESOURCE.ROLE],
+  });
   setToken(accessToken.access);
 
   responseHandler(req, reply, data, "User Login successfully", accessToken);
@@ -92,11 +107,14 @@ const createNewUser = async (
   if (uploadedImages.length === STATUSCODE.ZERO)
     throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
-  const data = await service.add({
-    ...req.body,
-    password: hashed,
-    image: uploadedImages,
-  });
+  const data = await service.add(
+    {
+      ...req.body,
+      password: hashed,
+      image: uploadedImages,
+    },
+    session,
+  );
 
   responseHandler(req, reply, [data], "User created successfully");
 };
@@ -109,13 +127,17 @@ const updateUser = async (
 
   const uploadNewImages = await multipleImages(
     req.files as unknown as MultipartFile[],
-    oldData?.image.map((image) => image.public_id),
+    oldData?.image.map((image: any) => image.public_id),
   );
 
-  const data = await service.update(req.params.id, {
-    ...req.body,
-    image: uploadNewImages,
-  });
+  const data = await service.update(
+    req.params.id,
+    {
+      ...req.body,
+      image: uploadNewImages,
+    },
+    session,
+  );
 
   responseHandler(req, reply, [data], "User updated successfully");
 };
@@ -124,7 +146,7 @@ const deleteUser = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.deleteById(req.params.id);
+  const data = await service.deleteById(req.params.id, session);
 
   responseHandler(
     req,
@@ -138,12 +160,12 @@ const restoreUser = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.restoreById(req.params.id);
+  const data = await service.restoreById(req.params.id, session);
 
   responseHandler(
     req,
     reply,
-    !data?.deleted ? [] : data,
+    !data?.deleted ? [] : [data],
     !data?.deleted ? "User is not deleted" : "User restored successfully",
   );
 };
@@ -152,16 +174,97 @@ const forceDeleteUser = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.forceDelete(req.params.id);
+  const data = await service.forceDelete(req.params.id, session);
 
   const message = !data ? "No User found" : "User force deleted successfully";
 
   await multipleImages(
     [],
-    data?.image ? data.image.map((image) => image.public_id) : [],
+    data?.image ? data.image.map((image: any) => image.public_id) : [],
   );
 
   responseHandler(req, reply, data, message);
+};
+
+const changeUserPassword = async (
+  req: FastifyRequest<{ Params: { id: string }; Body: ChangePassword }>,
+  reply: FastifyReply,
+) => {
+  if (!req.body.newPassword || !req.body.confirmPassword)
+    throw createError(STATUSCODE.BAD_REQUEST, "Both passwords are required");
+
+  if (req.body.newPassword !== req.body.confirmPassword)
+    throw createError(STATUSCODE.BAD_REQUEST, "Passwords do not match");
+
+  const data = await service.changePassword(
+    req.params.id,
+    req.body.newPassword,
+    session,
+  );
+
+  responseHandler(req, reply, [data], "Password changed successfully");
+};
+
+const sendUserEmailOTP = async (
+  req: FastifyRequest<{ Body: UserModel }>,
+  reply: FastifyReply,
+) => {
+  const email = await service.getEmail(req.body.email);
+
+  if (
+    new Date().getTime() -
+      new Date(email.verificationCode.createdAt).getTime() <
+    5 * 60 * 1000
+  ) {
+    throw createError(
+      400,
+      "Please wait 5 minutes before requesting a new verification code.",
+    );
+  }
+
+  const code = generateRandomCode();
+  await sendEmail(req.body.email, code);
+
+  const data = await service.sendEmailOTP(req.body.email, code, session);
+
+  responseHandler(req, reply, [data], "Email OTP sent successfully");
+};
+
+const resetUserEmailPassword = async (
+  req: FastifyRequest<{ Body: ForgotChangePassword }>,
+  reply: FastifyReply,
+) => {
+  if (
+    !req.body.newPassword ||
+    !req.body.confirmPassword ||
+    req.body.newPassword !== req.body.confirmPassword
+  )
+    throw createError(
+      STATUSCODE.BAD_REQUEST,
+      "Passwords are required and must match",
+    );
+
+  const code = await service.getCode(req.body.verificationCode);
+
+  if (
+    Date.now() - new Date(code.verificationCode.createdAt).getTime() >
+    5 * 60 * 1000
+  ) {
+    code.verificationCode = null;
+    await code.save();
+    throw createError("Verification code has expired");
+  }
+
+  const data = await service.resetPassword(
+    req.body.verificationCode,
+    req.body.newPassword,
+    session,
+  );
+
+  if (!data)
+    throw createError(STATUSCODE.BAD_REQUEST, "Invalid verification code");
+
+  responseHandler(req, reply, [data], "Password Successfully Reset");
 };
 
 export {
@@ -175,4 +278,7 @@ export {
   forceDeleteUser,
   loginUser,
   logoutUser,
+  changeUserPassword,
+  sendUserEmailOTP,
+  resetUserEmailPassword,
 };

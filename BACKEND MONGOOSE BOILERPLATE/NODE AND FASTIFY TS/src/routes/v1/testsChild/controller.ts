@@ -5,6 +5,9 @@ import service from "./service";
 import { STATUSCODE } from "../../../constants";
 import { responseHandler, multipleImages } from "../../../utils";
 import { TestChildModel } from "../../../types";
+import { ClientSession } from "mongoose";
+
+let session: ClientSession | null = null;
 
 const getAllTestsChild = async (req: FastifyRequest, reply: FastifyReply) => {
   const data = await service.getAll();
@@ -61,10 +64,13 @@ const createNewTestChild = async (
   if (uploadedImages.length === STATUSCODE.ZERO)
     throw createError(STATUSCODE.BAD_REQUEST, "Image is required");
 
-  const data = await service.add({
-    ...req.body,
-    image: uploadedImages,
-  });
+  const data = await service.add(
+    {
+      ...req.body,
+      image: uploadedImages,
+    },
+    session,
+  );
 
   responseHandler(req, reply, [data], "TestChild created successfully");
 };
@@ -77,13 +83,17 @@ const updateTestChild = async (
 
   const uploadNewImages = await multipleImages(
     req.files as unknown as MultipartFile[],
-    oldData?.image.map((image) => image.public_id) || [],
+    oldData?.image.map((image: any) => image.public_id) || [],
   );
 
-  const data = await service.update(req.params.id, {
-    ...req.body,
-    image: uploadNewImages,
-  });
+  const data = await service.update(
+    req.params.id,
+    {
+      ...req.body,
+      image: uploadNewImages,
+    },
+    session,
+  );
 
   responseHandler(req, reply, [data], "TestChild updated successfully");
 };
@@ -92,7 +102,7 @@ const deleteTestChild = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.deleteById(req.params.id);
+  const data = await service.deleteById(req.params.id, session);
   responseHandler(
     req,
     reply,
@@ -107,12 +117,12 @@ const restoreTestChild = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.restoreById(req.params.id);
+  const data = await service.restoreById(req.params.id, session);
 
   responseHandler(
     req,
     reply,
-    !data?.deleted ? [] : data,
+    !data?.deleted ? [] : [data],
     !data?.deleted
       ? "TestChild is not deleted"
       : "TestChild restored successfully",
@@ -123,7 +133,7 @@ const forceDeleteTestChild = async (
   req: FastifyRequest<{ Params: { id: string } }>,
   reply: FastifyReply,
 ) => {
-  const data = await service.forceDelete(req.params.id);
+  const data = await service.forceDelete(req.params.id, session);
 
   const message = !data
     ? "No TestChild found"
@@ -131,10 +141,10 @@ const forceDeleteTestChild = async (
 
   await multipleImages(
     [],
-    data?.image ? data.image.map((image) => image.public_id) : [],
+    data?.image ? data.image.map((image: any) => image.public_id) : [],
   );
 
-  responseHandler(req, reply, data, message);
+  responseHandler(req, reply, [data], message);
 };
 
 export {
