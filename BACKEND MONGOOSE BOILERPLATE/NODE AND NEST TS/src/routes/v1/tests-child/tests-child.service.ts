@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import mongoose, { Model } from "mongoose";
+import mongoose, { ClientSession, Model } from "mongoose";
 import { TestsChild } from "./entities/tests-child.entity";
 import { CreateTestsChildDto } from "./dto/create-tests-child.dto";
 import { UpdateTestsChildDto } from "./dto/update-tests-child.dto";
@@ -43,26 +43,40 @@ export class TestsChildService {
       .select("image");
   }
 
-  add(createTestsChildDto: CreateTestsChildDto) {
-    return this.testsChildModel.create(createTestsChildDto);
+  add(createTestsChildDto: CreateTestsChildDto, session: ClientSession) {
+    return this.testsChildModel.create([createTestsChildDto], { session });
   }
 
-  update(_id: string, updateTestsChildDto: UpdateTestsChildDto) {
+  update(
+    _id: string,
+    updateTestsChildDto: UpdateTestsChildDto,
+    session: ClientSession,
+  ) {
     return this.testsChildModel.findByIdAndUpdate(_id, updateTestsChildDto, {
       new: true,
       runValidators: true,
+      deleted: false,
+      session,
     });
   }
 
-  deleteById(_id: string) {
-    return this.testsChildModel.findByIdAndUpdate(_id, { deleted: true });
+  deleteById(_id: string, session: ClientSession) {
+    return this.testsChildModel.findByIdAndUpdate(
+      _id,
+      { deleted: true },
+      { session },
+    );
   }
 
-  restoreById(_id: string) {
-    return this.testsChildModel.findByIdAndUpdate(_id, { deleted: false });
+  restoreById(_id: string, session: ClientSession) {
+    return this.testsChildModel.findByIdAndUpdate(
+      _id,
+      { deleted: false },
+      { session },
+    );
   }
 
-  forceDelete(_id: string) {
-    return this.testsChildModel.findByIdAndDelete(_id);
+  forceDelete(_id: string, session: ClientSession) {
+    return this.testsChildModel.findByIdAndDelete(_id, { session });
   }
 }

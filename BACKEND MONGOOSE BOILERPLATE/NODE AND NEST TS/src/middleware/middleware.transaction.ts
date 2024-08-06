@@ -15,14 +15,10 @@ export class TransactionMiddleware implements NestMiddleware {
     (req as any).session = session;
 
     res.on("finish", async () => {
-      if (
-        res.statusCode >= HttpStatus.OK &&
-        res.statusCode < HttpStatus.BAD_REQUEST
-      ) {
-        await session.commitTransaction();
-      } else {
-        await session.abortTransaction();
-      }
+      res.statusCode >= HttpStatus.OK && res.statusCode < HttpStatus.BAD_REQUEST
+        ? await session.commitTransaction()
+        : await session.abortTransaction();
+
       session.endSession();
     });
 

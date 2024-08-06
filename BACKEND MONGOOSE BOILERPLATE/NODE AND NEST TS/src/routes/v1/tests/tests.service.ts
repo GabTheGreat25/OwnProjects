@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { ClientSession, Model } from "mongoose";
 import { Test } from "./entities/test.entity";
 import { TestsChild } from "../tests-child/entities/tests-child.entity";
 import { CreateTestDto } from "./dto/create-test.dto";
@@ -25,40 +25,47 @@ export class TestsService {
     return this.testModel.findOne({ _id, deleted: false });
   }
 
-  add(createTestDto: CreateTestDto) {
-    return this.testModel.create(createTestDto);
+  async add(createTestDto: CreateTestDto, session: ClientSession ) {
+    return this.testModel.create([createTestDto], { session });
   }
 
-  update(_id: string, updateTestDto: UpdateTestDto) {
+  async update(_id: string, updateTestDto: UpdateTestDto, session: ClientSession ) {
     return this.testModel.findByIdAndUpdate(_id, updateTestDto, {
       new: true,
       runValidators: true,
+      deleted: false,
+      session,
     });
   }
 
-  async deleteById(_id: string) {
-    return Promise.all([
-      this.testsChildModel.updateMany({ test: _id }, { deleted: true }),
-    ]).then(() =>
-      this.testModel.findByIdAndUpdate(_id, {
-        deleted: true,
-      }),
+  async deleteById(_id: string, session: ClientSession ) {
+    await this.testsChildModel.updateMany(
+      { test: _id },
+      { deleted: true },
+      { session },
+    );
+    return this.testModel.findByIdAndUpdate(
+      _id,
+      { deleted: true },
+      { session },
     );
   }
 
-  async restoreById(_id: string) {
-    return Promise.all([
-      this.testsChildModel.updateMany({ test: _id }, { deleted: false }),
-    ]).then(() =>
-      this.testModel.findByIdAndUpdate(_id, {
-        deleted: false,
-      }),
+  async restoreById(_id: string, session: ClientSession ) {
+    await this.testsChildModel.updateMany(
+      { test: _id },
+      { deleted: false },
+      { session },
+    );
+    return this.testModel.findByIdAndUpdate(
+      _id,
+      { deleted: false },
+      { session },
     );
   }
 
-  async forceDelete(_id: string) {
-    return Promise.all([this.testsChildModel.deleteMany({ test: _id })]).then(
-      () => this.testModel.findByIdAndDelete(_id),
-    );
+  async forceDelete(_id: string, session: ClientSession ) {
+    await this.testsChildModel.deleteMany({ test: _id }, { session });
+    return this.testModel.findByIdAndDelete(_id, { session });
   }
 }

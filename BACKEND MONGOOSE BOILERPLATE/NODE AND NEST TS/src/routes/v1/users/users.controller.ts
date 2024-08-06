@@ -13,6 +13,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   BadRequestException,
+  Req,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { JwtService } from "@nestjs/jwt";
@@ -107,16 +108,20 @@ export class UsersController {
   async createUser(
     @Body() createUserDto: CreateUserDto,
     @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
     const uploadedImages = await multipleImages(files, []);
 
     if (uploadedImages.length === STATUSCODE.ZERO)
       throw new BadRequestException("At least one image is required.");
 
-    const data = await this.service.add({
-      ...createUserDto,
-      image: uploadedImages,
-    });
+    const data = await this.service.add(
+      {
+        ...createUserDto,
+        image: uploadedImages,
+      },
+      (req as any).session,
+    );
 
     return responseHandler([data], "User created successfully");
   }
@@ -129,6 +134,7 @@ export class UsersController {
     @Param(RESOURCE.ID) _id: string,
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
     const oldData = await this.service.getById(_id);
 
@@ -137,10 +143,14 @@ export class UsersController {
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await this.service.update(_id, {
-      ...updateUserDto,
-      image: uploadNewImages,
-    });
+    const data = await this.service.update(
+      _id,
+      {
+        ...updateUserDto,
+        image: uploadNewImages,
+      },
+      (req as any).session,
+    );
 
     return responseHandler([data], "User updated successfully");
   }
@@ -148,8 +158,8 @@ export class UsersController {
   @Delete(PATH.DELETE)
   @UseGuards(JwtAuthGuard)
   @Roles(ROLE.ADMIN, ROLE.EMPLOYEE)
-  async deleteUser(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.deleteById(_id);
+  async deleteUser(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.deleteById(_id, (req as any).session);
 
     return responseHandler(
       data?.deleted ? [] : [data],
@@ -160,8 +170,8 @@ export class UsersController {
   @Put(PATH.RESTORE)
   @UseGuards(JwtAuthGuard)
   @Roles(ROLE.ADMIN, ROLE.EMPLOYEE)
-  async restoreUser(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.restoreById(_id);
+  async restoreUser(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.restoreById(_id, (req as any).session);
 
     return responseHandler(
       !data?.deleted ? [] : data,
@@ -172,8 +182,8 @@ export class UsersController {
   @Delete(PATH.FORCE_DELETE)
   @UseGuards(JwtAuthGuard)
   @Roles(ROLE.ADMIN, ROLE.EMPLOYEE)
-  async forceDeleteUser(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.forceDelete(_id);
+  async forceDeleteUser(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.forceDelete(_id, (req as any).session);
 
     const message = !data ? "No User found" : "User force deleted successfully";
 

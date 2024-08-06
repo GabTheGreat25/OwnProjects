@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   BadRequestException,
+  Req,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { TestsService } from "./tests.service";
@@ -61,16 +62,20 @@ export class TestsController {
   async createTest(
     @Body() createTestDto: CreateTestDto,
     @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
     const uploadedImages = await multipleImages(files, []);
 
     if (uploadedImages.length === STATUSCODE.ZERO)
       throw new BadRequestException("At least one image is required.");
 
-    const data = await this.service.add({
-      ...createTestDto,
-      image: uploadedImages,
-    });
+    const data = await this.service.add(
+      {
+        ...createTestDto,
+        image: uploadedImages,
+      },
+      (req as any).session,
+    );
 
     return responseHandler([data], "Test created successfully");
   }
@@ -81,6 +86,7 @@ export class TestsController {
     @Param(RESOURCE.ID) _id: string,
     @Body() updateTestDto: UpdateTestDto,
     @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
     const oldData = await this.service.getById(_id);
 
@@ -89,17 +95,21 @@ export class TestsController {
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await this.service.update(_id, {
-      ...updateTestDto,
-      image: uploadNewImages,
-    });
+    const data = await this.service.update(
+      _id,
+      {
+        ...updateTestDto,
+        image: uploadNewImages,
+      },
+      (req as any).session,
+    );
 
     return responseHandler([data], "Test updated successfully");
   }
 
   @Delete(PATH.DELETE)
-  async deleteTest(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.deleteById(_id);
+  async deleteTest(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.deleteById(_id, (req as any).session);
 
     return responseHandler(
       data?.deleted ? [] : [data],
@@ -108,8 +118,8 @@ export class TestsController {
   }
 
   @Put(PATH.RESTORE)
-  async restoreTest(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.restoreById(_id);
+  async restoreTest(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.restoreById(_id, (req as any).session);
 
     return responseHandler(
       !data?.deleted ? [] : data,
@@ -118,8 +128,8 @@ export class TestsController {
   }
 
   @Delete(PATH.FORCE_DELETE)
-  async forceDeleteTest(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.forceDelete(_id);
+  async forceDeleteTest(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.forceDelete(_id, (req as any).session);
 
     const message = !data ? "No Test found" : "Test force deleted successfully";
 

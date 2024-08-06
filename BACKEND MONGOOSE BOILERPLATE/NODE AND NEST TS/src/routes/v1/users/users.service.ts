@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { ClientSession, Model } from "mongoose";
 import { User } from "./entities/user.entity";
 import { Admin, Employee, Customer } from "./discriminators";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -34,7 +34,7 @@ export class UsersService {
       .select(RESOURCE.PASSWORD);
   }
 
-  async add(createUserDto: CreateUserDto) {
+  async add(createUserDto: CreateUserDto, session: ClientSession) {
     const modelToUse =
       createUserDto.role === ROLE.ADMIN
         ? this.adminModel
@@ -44,25 +44,35 @@ export class UsersService {
             ? this.customerModel
             : this.userModel;
 
-    return await new modelToUse(createUserDto).save();
+    return await new modelToUse(createUserDto).save({ session });
   }
 
-  update(_id: string, updateUserDto: UpdateUserDto) {
+  update(_id: string, updateUserDto: UpdateUserDto, session: ClientSession) {
     return this.userModel.findByIdAndUpdate(_id, updateUserDto, {
       new: true,
       runValidators: true,
+      deleted: false,
+      session,
     });
   }
 
-  deleteById(_id: string) {
-    return this.userModel.findByIdAndUpdate(_id, { deleted: true });
+  deleteById(_id: string, session: ClientSession) {
+    return this.userModel.findByIdAndUpdate(
+      _id,
+      { deleted: true },
+      { session },
+    );
   }
 
-  restoreById(_id: string) {
-    return this.userModel.findByIdAndUpdate(_id, { deleted: false });
+  restoreById(_id: string, session: ClientSession) {
+    return this.userModel.findByIdAndUpdate(
+      _id,
+      { deleted: false },
+      { session },
+    );
   }
 
-  forceDelete(_id: string) {
-    return this.userModel.findByIdAndDelete(_id);
+  forceDelete(_id: string, session: ClientSession) {
+    return this.userModel.findByIdAndDelete(_id, { session });
   }
 }

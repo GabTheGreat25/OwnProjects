@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   BadRequestException,
+  Req,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { TestsChildService } from "./tests-child.service";
@@ -61,16 +62,20 @@ export class TestsChildController {
   async createTestChild(
     @Body() createTestsChildDto: CreateTestsChildDto,
     @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
     const uploadedImages = await multipleImages(files, []);
 
     if (uploadedImages.length === STATUSCODE.ZERO)
       throw new BadRequestException("At least one image is required.");
 
-    const data = await this.service.add({
-      ...createTestsChildDto,
-      image: uploadedImages,
-    });
+    const data = await this.service.add(
+      {
+        ...createTestsChildDto,
+        image: uploadedImages,
+      },
+      (req as any).session,
+    );
 
     return responseHandler([data], "TestChild created successfully");
   }
@@ -81,6 +86,7 @@ export class TestsChildController {
     @Param(RESOURCE.ID) _id: string,
     @Body() updateTestsChildDto: UpdateTestsChildDto,
     @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
     const oldData = await this.service.getImageById(_id);
 
@@ -89,17 +95,21 @@ export class TestsChildController {
       oldData?.image.map((image) => image.public_id) || [],
     );
 
-    const data = await this.service.update(_id, {
-      ...updateTestsChildDto,
-      image: uploadNewImages,
-    });
+    const data = await this.service.update(
+      _id,
+      {
+        ...updateTestsChildDto,
+        image: uploadNewImages,
+      },
+      (req as any).session,
+    );
 
     return responseHandler([data], "TestChild updated successfully");
   }
 
   @Delete(PATH.DELETE)
-  async deleteTestChild(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.deleteById(_id);
+  async deleteTestChild(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.deleteById(_id, (req as any).session);
 
     return responseHandler(
       data?.deleted ? [] : [data],
@@ -110,8 +120,8 @@ export class TestsChildController {
   }
 
   @Put(PATH.RESTORE)
-  async restoreTestChild(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.restoreById(_id);
+  async restoreTestChild(@Param(RESOURCE.ID) _id: string, @Req() req: Request) {
+    const data = await this.service.restoreById(_id, (req as any).session);
 
     return responseHandler(
       !data?.deleted ? [] : data,
@@ -122,8 +132,11 @@ export class TestsChildController {
   }
 
   @Delete(PATH.FORCE_DELETE)
-  async forceDeleteTestChild(@Param(RESOURCE.ID) _id: string) {
-    const data = await this.service.forceDelete(_id);
+  async forceDeleteTestChild(
+    @Param(RESOURCE.ID) _id: string,
+    @Req() req: Request,
+  ) {
+    const data = await this.service.forceDelete(_id, (req as any).session);
 
     const message = !data
       ? "No TestChild found"
