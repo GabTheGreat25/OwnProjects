@@ -12,6 +12,5 @@ export class UpdateTestsChildDto extends PartialType(CreateTestsChildDto) {
   @IsNotEmpty()
   message: string;
 
-  @IsNotEmpty()
   image: UploadImages[];
 }

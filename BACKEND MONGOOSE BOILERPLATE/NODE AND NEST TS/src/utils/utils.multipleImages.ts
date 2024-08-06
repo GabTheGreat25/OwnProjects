@@ -17,16 +17,19 @@ export async function multipleImages(
       (file) =>
         new Promise<UploadImages>((resolve, reject) =>
           cloudinary.uploader
-            .upload_stream({ folder: RESOURCE.IMAGES }, (error, result) => {
-              resolve({
-                public_id: result?.public_id,
-                url: result?.secure_url.replace(
-                  /\/([^\/]+)$/,
-                  `/${file.originalname}`,
-                ),
-                originalname: file.originalname,
-              });
-            })
+            .upload_stream(
+              { folder: RESOURCE.CLOUDINARY_FOLDER },
+              (error, result) => {
+                resolve({
+                  public_id: result?.public_id,
+                  url: result?.secure_url.replace(
+                    /\/([^\/]+)$/,
+                    `/${file.originalname}`,
+                  ),
+                  originalname: file.originalname,
+                });
+              },
+            )
             .end(file.buffer),
         ),
     ),

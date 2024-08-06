@@ -12,6 +12,7 @@ import {
   UseGuards,
   UnauthorizedException,
   NotFoundException,
+  BadRequestException,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { JwtService } from "@nestjs/jwt";
@@ -81,7 +82,10 @@ export class UsersController {
     if (!(await bcrypt.compare(loginUserDto.password, data.password)))
       throw new UnauthorizedException("Password does not match");
 
-    const accessToken = this.jwtService.sign({ role: data[RESOURCE.ROLE] });
+    const accessToken = this.jwtService.sign({
+      id: data._id,
+      role: data[RESOURCE.ROLE],
+    });
     this.tokenService.setToken(accessToken);
 
     return responseHandler(data, "User Login successfully", {
@@ -104,11 +108,14 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    const uploadImages = await multipleImages(files, []);
+    const uploadedImages = await multipleImages(files, []);
+
+    if (uploadedImages.length === STATUSCODE.ZERO)
+      throw new BadRequestException("At least one image is required.");
 
     const data = await this.service.add({
       ...createUserDto,
-      image: uploadImages,
+      image: uploadedImages,
     });
 
     return responseHandler([data], "User created successfully");

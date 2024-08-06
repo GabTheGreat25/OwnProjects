@@ -9,6 +9,7 @@ import {
   Delete,
   UseInterceptors,
   UploadedFiles,
+  BadRequestException,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { TestsService } from "./tests.service";
@@ -62,6 +63,9 @@ export class TestsController {
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     const uploadedImages = await multipleImages(files, []);
+
+    if (uploadedImages.length === STATUSCODE.ZERO)
+      throw new BadRequestException("At least one image is required.");
 
     const data = await this.service.add({
       ...createTestDto,

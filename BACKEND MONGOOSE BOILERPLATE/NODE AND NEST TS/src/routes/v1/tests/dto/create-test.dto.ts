@@ -6,6 +6,5 @@ export class CreateTestDto {
   @IsNotEmpty()
   message: string;
 
-  @IsNotEmpty()
   image: UploadImages[];
 }

@@ -7,6 +7,7 @@ import {
   Logger,
 } from "@nestjs/common";
 import { Request, Response } from "express";
+import { MongoServerError } from "mongodb";
 import { ENV } from "src/config";
 import { RESOURCE } from "src/constants";
 
@@ -19,11 +20,16 @@ export class addErrorHandler implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status =
-      exception instanceof HttpException
+    const isMongoError = exception instanceof MongoServerError;
+    const status = isMongoError
+      ? HttpStatus.BAD_REQUEST
+      : exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    const errorResponse = this.createErrorResponse(exception, request.url);
+
+    const errorResponse = isMongoError
+      ? this.createMongoErrorResponse(exception, request.url)
+      : this.createErrorResponse(exception, request.url);
 
     this.logger.error("\x1b[31m" + JSON.stringify(errorResponse) + "\x1b[0m");
 
@@ -34,16 +40,30 @@ export class addErrorHandler implements ExceptionFilter {
     const defaultMessage = RESOURCE.INTERNAL_SERVER_ERROR;
     const message =
       exception instanceof HttpException
-        ? exception.getResponse()["message"] || exception.message
+        ? (exception.getResponse() as any).message || exception.message
         : defaultMessage;
     const error =
       exception instanceof HttpException
-        ? exception.getResponse()["error"] || defaultMessage
+        ? (exception.getResponse() as any).error || defaultMessage
         : defaultMessage;
 
     return {
       message,
       error,
+      path,
+      stack:
+        ENV.NODE_ENV === RESOURCE.PRODUCTION
+          ? undefined
+          : (exception as Error).stack,
+    };
+  }
+
+  private createMongoErrorResponse(exception: MongoServerError, path: string) {
+    const detailedError = exception.message;
+
+    return {
+      message: detailedError,
+      error: "MongoDb Error",
       path,
       stack:
         ENV.NODE_ENV === RESOURCE.PRODUCTION

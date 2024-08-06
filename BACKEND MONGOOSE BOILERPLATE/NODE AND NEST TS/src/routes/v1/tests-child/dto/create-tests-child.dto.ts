@@ -10,6 +10,5 @@ export class CreateTestsChildDto {
   @IsNotEmpty()
   message: string;
 
-  @IsNotEmpty()
   image: UploadImages[];
 }
