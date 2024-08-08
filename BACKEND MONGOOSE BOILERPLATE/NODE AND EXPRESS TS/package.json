@@ -6,8 +6,8 @@
   "scripts": {
     "build": "npx tsc && npx copyfiles -u 1 src/views/**/* dist/src",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "node dist/server.js",
-    "dev": "npx tsc && npx copyfiles -u 1 src/views/**/* dist/src && nodemon dist/server.js"
+    "start": "npx copyfiles -u 1 src/views/**/* dist/src && npx tsc && node dist/server.js",
+    "dev": "npx copyfiles -u 1 src/views/**/* dist/src && npx tsc --watch && nodemon dist/server.js"
   },
   "author": "GabTheGreat25",
   "license": "ISC",
