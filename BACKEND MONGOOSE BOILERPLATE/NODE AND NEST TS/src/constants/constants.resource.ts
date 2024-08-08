@@ -6,6 +6,7 @@ export const RESOURCE = {
   API: "api",
   V1: "/v1",
   CLOUDINARY_FOLDER: "projectImages",
+  FINISH: "finish",
   ID: "id",
   _ID: "_id",
   ROLE: "role",

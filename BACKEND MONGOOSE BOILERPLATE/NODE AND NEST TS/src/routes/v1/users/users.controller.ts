@@ -22,7 +22,12 @@ import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { responseHandler, multipleImages } from "src/utils";
+import {
+  responseHandler,
+  multipleImages,
+  sendEmail,
+  generateRandomCode,
+} from "src/utils";
 import { STATUSCODE, PATH, RESOURCE, ROLE } from "src/constants";
 import { JwtAuthGuard, TokenService, Roles } from "src/middleware";
 
@@ -193,5 +198,96 @@ export class UsersController {
     );
 
     return responseHandler(data, message);
+  }
+
+  @Patch(PATH.CHANGE_PASSWORD)
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLE.ADMIN, ROLE.EMPLOYEE, ROLE.CUSTOMER)
+  async changeUserPassword(
+    @Param(RESOURCE.ID) _id: string,
+    @Body() body: { newPassword: string; confirmPassword: string },
+    @Req() req: Request,
+  ) {
+    const { newPassword, confirmPassword } = body;
+
+    if (!newPassword || !confirmPassword)
+      throw new BadRequestException("Both passwords are required");
+
+    if (newPassword !== confirmPassword)
+      throw new BadRequestException("Passwords do not match");
+
+    const data = await this.service.changePassword(
+      _id,
+      newPassword,
+      (req as any).session,
+    );
+
+    return responseHandler([data], "Password changed successfully");
+  }
+
+  @Post(PATH.EMAIL_OTP)
+  async sendUserEmailOTP(@Body() body: { email: string }, @Req() req: Request) {
+    const existingEmail = await this.service.getEmail(body.email);
+
+    const verificationCode = existingEmail.verificationCode;
+
+    if (existingEmail.verificationCode)
+      if (
+        new Date().getTime() - new Date(verificationCode.createdAt).getTime() <
+        5 * 60 * 1000
+      )
+        throw new BadRequestException(
+          "Please wait 5 minutes before requesting a new verification code.",
+        );
+
+    const code = generateRandomCode();
+    await sendEmail(body.email, code);
+
+    const data = await this.service.sendEmailOTP(
+      body.email,
+      code,
+      (req as any).session,
+    );
+
+    return responseHandler([data], "Email OTP sent successfully");
+  }
+
+  @Patch(PATH.RESTORE_PASSWORD)
+  async resetUserEmailPassword(
+    @Body()
+    body: {
+      newPassword: string;
+      confirmPassword: string;
+      verificationCode: string;
+    },
+    @Req() req: Request,
+  ) {
+    if (
+      !body.newPassword ||
+      !body.confirmPassword ||
+      body.newPassword !== body.confirmPassword
+    )
+      throw new BadRequestException("Passwords are required and must match");
+
+    const code = await this.service.getCode(body.verificationCode);
+
+    if (
+      Date.now() - new Date(code.verificationCode.createdAt).getTime() >
+      5 * 60 * 1000
+    ) {
+      code.verificationCode = null;
+      await code.save();
+      throw new BadRequestException("Verification code has expired");
+    }
+
+    const data = await this.service.resetPassword(
+      body.verificationCode,
+      body.newPassword,
+      (req as any).session,
+    );
+
+    if (!data) throw new BadRequestException("Invalid verification code");
+
+    return responseHandler([data], "Password Successfully Reset");
   }
 }

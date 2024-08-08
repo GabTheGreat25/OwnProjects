@@ -17,15 +17,15 @@ export class UsersService {
   ) {}
 
   getAll() {
-    return this.userModel.find({ deleted: false });
+    return this.userModel.find({ deleted: false }).exec();
   }
 
   getAllDeleted() {
-    return this.userModel.find({ deleted: true });
+    return this.userModel.find({ deleted: true }).exec();
   }
 
   getById(_id: string) {
-    return this.userModel.findOne({ _id, deleted: false });
+    return this.userModel.findOne({ _id, deleted: false }).exec();
   }
 
   getEmail(email: string) {
@@ -34,7 +34,7 @@ export class UsersService {
       .select(RESOURCE.PASSWORD);
   }
 
-  async add(createUserDto: CreateUserDto, session: ClientSession) {
+  add(createUserDto: CreateUserDto, session: ClientSession) {
     const modelToUse =
       createUserDto.role === ROLE.ADMIN
         ? this.adminModel
@@ -44,7 +44,7 @@ export class UsersService {
             ? this.customerModel
             : this.userModel;
 
-    return await new modelToUse(createUserDto).save({ session });
+    return new modelToUse(createUserDto).save({ session });
   }
 
   update(_id: string, updateUserDto: UpdateUserDto, session: ClientSession) {
@@ -73,6 +73,60 @@ export class UsersService {
   }
 
   forceDelete(_id: string, session: ClientSession) {
-    return this.userModel.findByIdAndDelete(_id, { session });
+    return this.userModel.findByIdAndDelete(_id, { session }).exec();
+  }
+
+  changePassword(_id: string, newPassword: string, session: ClientSession) {
+    return this.userModel.findByIdAndUpdate(
+      _id,
+      { password: newPassword },
+      {
+        new: true,
+        runValidators: true,
+        select: RESOURCE.PASSWORD,
+        deleted: false,
+        session,
+      },
+    );
+  }
+
+  getCode(verificationCode: string) {
+    return this.userModel.findOne({
+      "verificationCode.code": verificationCode,
+      deleted: false,
+    });
+  }
+
+  async sendEmailOTP(email: string, otp: string, session: ClientSession) {
+    return await this.userModel.findByIdAndUpdate(
+      (await this.userModel.findOne({ email }))?._id,
+      {
+        $set: {
+          verificationCode: { code: otp, createdAt: new Date().toISOString() },
+        },
+      },
+      { new: true, runValidators: true, session },
+    );
+  }
+
+  async resetPassword(
+    verificationCode: string,
+    newPassword: string,
+    session: ClientSession,
+  ) {
+    return await this.userModel
+      .findByIdAndUpdate(
+        (
+          await this.userModel.findOne({
+            "verificationCode.code": verificationCode,
+          })
+        )?._id,
+        {
+          verificationCode: null,
+          password: newPassword,
+        },
+        { new: true, runValidators: true, deleted: false, session },
+      )
+      .select(RESOURCE.PASSWORD);
   }
 }

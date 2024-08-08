@@ -25,11 +25,15 @@ export class TestsService {
     return this.testModel.findOne({ _id, deleted: false });
   }
 
-  async add(createTestDto: CreateTestDto, session: ClientSession ) {
+  async add(createTestDto: CreateTestDto, session: ClientSession) {
     return this.testModel.create([createTestDto], { session });
   }
 
-  async update(_id: string, updateTestDto: UpdateTestDto, session: ClientSession ) {
+  async update(
+    _id: string,
+    updateTestDto: UpdateTestDto,
+    session: ClientSession,
+  ) {
     return this.testModel.findByIdAndUpdate(_id, updateTestDto, {
       new: true,
       runValidators: true,
@@ -38,7 +42,7 @@ export class TestsService {
     });
   }
 
-  async deleteById(_id: string, session: ClientSession ) {
+  async deleteById(_id: string, session: ClientSession) {
     await this.testsChildModel.updateMany(
       { test: _id },
       { deleted: true },
@@ -51,7 +55,7 @@ export class TestsService {
     );
   }
 
-  async restoreById(_id: string, session: ClientSession ) {
+  async restoreById(_id: string, session: ClientSession) {
     await this.testsChildModel.updateMany(
       { test: _id },
       { deleted: false },
@@ -64,7 +68,7 @@ export class TestsService {
     );
   }
 
-  async forceDelete(_id: string, session: ClientSession ) {
+  async forceDelete(_id: string, session: ClientSession) {
     await this.testsChildModel.deleteMany({ test: _id }, { session });
     return this.testModel.findByIdAndDelete(_id, { session });
   }

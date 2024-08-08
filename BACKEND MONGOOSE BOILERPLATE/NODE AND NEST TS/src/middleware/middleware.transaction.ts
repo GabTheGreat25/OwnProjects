@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { InjectConnection } from "@nestjs/mongoose";
 import { Connection } from "mongoose";
 import { HttpStatus } from "@nestjs/common";
+import { RESOURCE } from "src/constants";
 
 @Injectable()
 export class TransactionMiddleware implements NestMiddleware {
@@ -14,7 +15,7 @@ export class TransactionMiddleware implements NestMiddleware {
 
     (req as any).session = session;
 
-    res.on("finish", async () => {
+    res.on(RESOURCE.FINISH, async () => {
       res.statusCode >= HttpStatus.OK && res.statusCode < HttpStatus.BAD_REQUEST
         ? await session.commitTransaction()
         : await session.abortTransaction();

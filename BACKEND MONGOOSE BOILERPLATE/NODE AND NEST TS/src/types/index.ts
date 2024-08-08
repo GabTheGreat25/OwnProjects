@@ -14,3 +14,8 @@ export interface UploadImages {
   url: string;
   originalname: string;
 }
+
+export interface VerifyCode {
+  code?: string;
+  createdAt?: Date;
+}

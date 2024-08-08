@@ -2,7 +2,7 @@ import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
 import * as bcrypt from "bcrypt";
 import { RESOURCE } from "src/constants";
-import { UploadImages } from "src/types";
+import { UploadImages, VerifyCode } from "src/types";
 import { ENV } from "src/config";
 
 @Schema({ timestamps: true, discriminatorKey: RESOURCE.ROLE })
@@ -26,6 +26,15 @@ export class User extends Document {
     required: true,
   })
   image: UploadImages[];
+
+  @Prop({
+    type: {
+      code: { type: String, required: false, default: null },
+      createdAt: { type: Date, required: false, default: null },
+    },
+    required: false,
+  })
+  verificationCode?: VerifyCode;
 
   @Prop({ default: false })
   deleted: boolean;
