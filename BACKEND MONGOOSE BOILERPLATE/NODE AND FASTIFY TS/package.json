@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "build": "npx tsc && npx copyfiles -u 1 src/views/**/* dist/src",
+    "build": "npx copyfiles -u 1 src/views/**/* dist/src && npx tsc",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "npx copyfiles -u 1 src/views/**/* dist/src && npx tsc && node dist/server.js",
-    "dev": "npx copyfiles -u 1 src/views/**/* dist/src && npx tsc --watch && nodemon dist/server.js"
+    "dev": "npx copyfiles -u 1 src/views/**/* dist/src && npx tsc && nodemon dist/server.js"
   },
   "author": "GabTheGreat25",
   "license": "ISC",

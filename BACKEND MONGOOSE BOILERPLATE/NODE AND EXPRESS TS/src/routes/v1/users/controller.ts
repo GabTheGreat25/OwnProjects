@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import createError from "http-errors";
 import bcrypt from "bcrypt";
@@ -17,6 +17,7 @@ import {
   getToken,
   blacklistToken,
   generateAccess,
+  isTokenBlacklisted,
 } from "../../../middlewares";
 
 const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
@@ -70,13 +71,16 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   responseHandler(res, data, "User Login successfully", accessToken);
 });
 
-const logoutUser = asyncHandler(async (req: Request, res: Response) => {
-  const savedToken = getToken();
+const logoutUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const savedToken = getToken();
 
-  if (savedToken) blacklistToken();
-
-  responseHandler(res, [], "User Logout successfully");
-});
+    !savedToken || isTokenBlacklisted()
+      ? next(createError(STATUSCODE.UNAUTHORIZED, "You are not logged in"))
+      : (blacklistToken(),
+        responseHandler(res, [], "User Logout successfully"));
+  },
+);
 
 const createNewUser = [
   upload.array("image"),

@@ -103,9 +103,12 @@ export class UsersController {
   async logoutUser() {
     const savedToken = this.tokenService.getToken();
 
-    if (savedToken) this.tokenService.blacklistToken();
-
-    return responseHandler([], "User Logout successfully");
+    return !savedToken || this.tokenService.isTokenBlacklisted()
+      ? (() => {
+          throw new UnauthorizedException("You are not logged in");
+        })()
+      : (this.tokenService.blacklistToken(),
+        responseHandler([], "User Logout successfully"));
   }
 
   @Post()

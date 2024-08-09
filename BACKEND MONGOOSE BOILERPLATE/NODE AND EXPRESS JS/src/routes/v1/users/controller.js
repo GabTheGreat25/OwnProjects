@@ -16,6 +16,7 @@ import {
   getToken,
   blacklistToken,
   generateAccess,
+  isTokenBlacklisted,
 } from "../../../middlewares/index.js";
 
 const getAllUsers = asyncHandler(async (req, res) => {
@@ -69,12 +70,12 @@ const loginUser = asyncHandler(async (req, res) => {
   responseHandler(res, data, "User Login successfully", accessToken);
 });
 
-const logoutUser = asyncHandler(async (req, res) => {
+const logoutUser = asyncHandler(async (req, res, next) => {
   const savedToken = getToken();
 
-  if (savedToken) blacklistToken();
-
-  responseHandler(res, [], "User Logout successfully");
+  !savedToken || isTokenBlacklisted()
+    ? next(createError(STATUSCODE.UNAUTHORIZED, "You are not logged in"))
+    : (blacklistToken(), responseHandler(res, [], "User Logout successfully"));
 });
 
 const createNewUser = [
