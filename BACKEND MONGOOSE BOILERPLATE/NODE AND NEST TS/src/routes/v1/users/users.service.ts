@@ -51,7 +51,6 @@ export class UsersService {
     return this.userModel.findByIdAndUpdate(_id, updateUserDto, {
       new: true,
       runValidators: true,
-      deleted: false,
       session,
     });
   }

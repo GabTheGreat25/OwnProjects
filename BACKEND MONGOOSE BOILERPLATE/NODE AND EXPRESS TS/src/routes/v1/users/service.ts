@@ -50,7 +50,6 @@ async function update(_id: string, body: UserModel, session: any) {
     overwriteDiscriminatorKey: true,
     new: true,
     runValidators: true,
-    deleted: false,
     session,
   });
 }

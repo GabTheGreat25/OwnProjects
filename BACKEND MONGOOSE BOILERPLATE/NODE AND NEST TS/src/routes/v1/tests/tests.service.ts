@@ -37,7 +37,6 @@ export class TestsService {
     return this.testModel.findByIdAndUpdate(_id, updateTestDto, {
       new: true,
       runValidators: true,
-      deleted: false,
       session,
     });
   }

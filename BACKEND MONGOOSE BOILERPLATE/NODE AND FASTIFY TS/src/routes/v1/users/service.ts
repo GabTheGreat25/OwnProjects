@@ -42,26 +42,27 @@ async function add(body: UserModel, session: any) {
           ? CustomerDiscriminator
           : model;
 
-  return await (modelToUse as typeof model).create(body);
+  return await (modelToUse as typeof model).create([body], { session });
 }
 
 async function update(_id: string, body: UserModel, session: any) {
   return await model.findByIdAndUpdate(_id, body, {
     new: true,
     runValidators: true,
+    session,
   });
 }
 
 async function deleteById(_id: string, session: any) {
-  return await model.findByIdAndUpdate(_id, { deleted: true });
+  return await model.findByIdAndUpdate(_id, { deleted: true }, { session });
 }
 
 async function restoreById(_id: string, session: any) {
-  return await model.findByIdAndUpdate(_id, { deleted: false });
+  return await model.findByIdAndUpdate(_id, { deleted: false }, { session });
 }
 
 async function forceDelete(_id: string, session: any) {
-  return await model.findByIdAndDelete(_id);
+  return await model.findByIdAndDelete(_id, { session });
 }
 
 async function changePassword(_id: string, newPassword: string, session: any) {

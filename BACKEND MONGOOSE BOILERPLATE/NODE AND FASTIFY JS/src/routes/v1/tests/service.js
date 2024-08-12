@@ -21,7 +21,6 @@ async function update(_id, body, session) {
   return await model.findByIdAndUpdate(_id, body, {
     new: true,
     runValidators: true,
-    deleted: false,
     session,
   });
 }

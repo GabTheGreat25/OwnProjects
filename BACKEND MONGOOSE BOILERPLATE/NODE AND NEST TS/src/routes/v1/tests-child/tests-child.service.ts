@@ -55,7 +55,6 @@ export class TestsChildService {
     return this.testsChildModel.findByIdAndUpdate(_id, updateTestsChildDto, {
       new: true,
       runValidators: true,
-      deleted: false,
       session,
     });
   }

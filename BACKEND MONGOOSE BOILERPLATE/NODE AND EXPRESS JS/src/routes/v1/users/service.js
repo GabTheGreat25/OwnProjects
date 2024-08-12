@@ -43,7 +43,6 @@ async function update(_id, body, session) {
     overwriteDiscriminatorKey: true,
     new: true,
     runValidators: true,
-    deleted: false,
     session,
   });
 }
